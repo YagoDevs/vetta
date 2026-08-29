@@ -1,0 +1,19 @@
+# python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# segredos — NUNCA commitados (regra 08 do hackathon)
+.env
+*.key
+
+# sistema
+.DS_Store
+
+# frontend (quando existir)
+frontend/node_modules/
+frontend/dist/
+
+# artefatos de execucao local nao-oficiais
+results/scratch/
