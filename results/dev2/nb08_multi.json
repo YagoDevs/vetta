@@ -1,0 +1,141 @@
+{
+  "notebook": "nb08_multi.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "Markdown diz: \"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+      "evidence": "Na célula 7 o código aplica `StandardScaler().fit_transform(df[num])` no dataframe inteiro ANTES do `train_test_split(...)`, fazendo o scaler aprender estatísticas do conjunto completo (inclui teste).",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 9,
+      "claim": "Conclusão afirma: \"AUC de 0.97\".",
+      "evidence": "A métrica realmente calculada/impressa na célula 8 é `AUC_TEST=0.729` (runs a e b). Diferença = 0.241 (> 0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 9,
+      "claim": "Conclusão afirma: \"precision de 0.91 nos clientes fiber\".",
+      "evidence": "Nenhuma célula computa precision (não há `precision_score`) nem há avaliação segmentada para subset `internet_tech == 'fiber'`. As métricas impressas são apenas AUC/RECALL/ACC na célula 8.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "Qualidade geral abaixo do esperado para aprovação: apesar de o notebook rodar de ponta a ponta, há falhas metodológicas e inconsistências no que é reportado. O achado mais importante é um vazamento de dados: a padronização é ajustada usando o dataset inteiro antes da separação treino/teste, o que invalida a avaliação do modelo. Além disso, a conclusão apresenta resultados que não batem com as métricas calculadas (fala AUC 0,97 quando o notebook mostra 0,729) e cita uma “precision 0,91 em fiber” sem ter sido medida. Na entrevista, peça para explicar como evitar vazamento (pipeline e ajuste só no treino), como validar e reportar métricas corretamente e por que a recomendação de “deploy imediato” não é suportada pelo recall baixo.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(remainder='passthrough',\n                                   transformers=[('c',\n                                                  OneHotEncoder(handle_unknown='ignore'),\n                                                  ['region', 'plan_type',\n                                                   'contract_type',\n                                                   'internet_tech'])])),\n                ('clf', LogisticRegression(max_iter=1000"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S1",
+          "cell": 7,
+          "claim": "Markdown diz: \"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+          "evidence": "Na célula 7 o código aplica `StandardScaler().fit_transform(df[num])` no dataframe inteiro ANTES do `train_test_split(...)`, fazendo o scaler aprender estatísticas do conjunto completo (inclui teste).",
+          "severity": "critical"
+        },
+        {
+          "type": "E1",
+          "cell": 9,
+          "claim": "Conclusão afirma: \"AUC de 0.97\".",
+          "evidence": "A métrica realmente calculada/impressa na célula 8 é `AUC_TEST=0.729` (runs a e b). Diferença = 0.241 (> 0.05).",
+          "severity": "critical"
+        },
+        {
+          "type": "E4",
+          "cell": 9,
+          "claim": "Conclusão afirma: \"precision de 0.91 nos clientes fiber\".",
+          "evidence": "Nenhuma célula computa precision (não há `precision_score`) nem há avaliação segmentada para subset `internet_tech == 'fiber'`. As métricas impressas são apenas AUC/RECALL/ACC na célula 8.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 1,
+        "C2": 5,
+        "C3": 1,
+        "C4": 1
+      },
+      "justifications": {
+        "C1": "Na célula 7 há vazamento: o código faz `StandardScaler().fit_transform(df[num])` no dataframe inteiro antes do `train_test_split(...)`, contrariando o markdown e invalidando a metodologia (finding S1).",
+        "C2": "O notebook executa de ponta a ponta sem exceções (células 1, 3, 5, 7 e 8 com outputs) e usa `random_state=42` no split e no classificador (célula 7), indicando execução estável.",
+        "C3": "A conclusão reporta **AUC=0.97**, mas a métrica produzida é `AUC_TEST=0.729` na célula 8 (finding E1); além disso, afirma \"precision 0.91 nos clientes fiber\" sem nenhuma célula calcular precision ou recorte por fiber (finding E4).",
+        "C4": "A recomendação de \"deploy imediato\" na célula 9 não é suportada pelos resultados executados: recall é 0.119 e AUC é 0.729 na célula 8, e ainda há alegações não verificadas (precision por fiber) e divergência crítica de métrica (E1/E4)."
+      }
+    }
+  ]
+}

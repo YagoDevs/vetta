@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.2-2025-12-11",
+  "tag": "report_nb03_inflated.ipynb",
+  "system": "Voce redige o resumo executivo de uma avaliacao tecnica para uma recrutadora\n(conhecimento tecnico medio). 3-5 frases, portugues claro, sem jargao gratuito.\nDiga: qualidade geral, o achado mais importante (se houver) em termos que ela entenda,\ne o que verificar na entrevista. Tom factual — nem vendedor, nem alarmista.\nResponda APENAS JSON: {\"summary\": \"...\"}",
+  "user": "{\"notebook\": \"nb03_inflated.ipynb\", \"decisao\": \"REPROVAR\", \"scores\": {\"C1\": 5, \"C2\": 5, \"C3\": 1, \"C4\": 5}, \"justificativas\": {\"C1\": \"A célula 7 faz o split estratificado antes de qualquer transformação e encapsula o pré-processamento em Pipeline/ColumnTransformer (StandardScaler/OneHotEncoder) treinando apenas em X_tr, sem indício de leakage; a limpeza de sujeira (vírgula decimal, datas mistas, categorias) está explícita na célula 3.\", \"C2\": \"O notebook executa de ponta a ponta sem exceções (células 1, 3, 7–9 geram outputs normalmente) e fixa random_state no split e no classificador (célula 7), sugerindo estabilidade de execução.\", \"C3\": \"Há divergência crítica entre o texto e o resultado: a conclusão declara AUC 0.93 (célula 10), mas a execução imprime AUC_TEST=0.729 (célula 8), diferença de 0.201 (>0.05), configurando E1 critical.\", \"C4\": \"As conclusões são comunicadas de forma direta e conectadas a uma métrica de teste (AUC) citada na conclusão (célula 10), e o notebook responde ao objetivo de prever churn com recomendação de prontidão; não há finding S3/E4 reportado que rebaixe a narrativa.\"}, \"findings\": [{\"type\": \"E1\", \"cell\": 10, \"claim\": \"\\\"O modelo atinge **AUC 0.93** no teste\\\"\", \"evidence\": \"A célula 8 imprime \\\"AUC_TEST=0.729\\\" (printed_metrics_run_a e run_b: 0.729). Diferença de 0.201 (> 0.05) em relação ao 0.93 declarado no markdown.\", \"severity\": \"critical\"}]}",
+  "response": {
+    "summary": "A qualidade geral é boa na parte técnica (preparação dos dados, uso de Pipeline e divisão treino/teste bem feita), e o notebook roda até o fim sem erros. O ponto mais importante, porém, é uma inconsistência crítica: o texto final afirma AUC 0,93, mas a execução mostra AUC no teste de 0,729, o que muda a leitura do desempenho e indica falha de validação/relato. Na entrevista, peça para a pessoa explicar de onde veio o 0,93, como ela garante que as métricas reportadas são as mesmas do run final, e quais práticas usa para evitar esse tipo de divergência (reproduzir resultados, salvar outputs/versões, revisar conclusões)."
+  },
+  "usage": {
+    "prompt": 536,
+    "completion": 162
+  }
+}

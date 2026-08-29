@@ -1,0 +1,141 @@
+{
+  "notebook": "nb07_unstable.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 3,
+      "claim": "\"O CSV tem decimais com vírgula, datas em dois formatos e categorias inconsistentes — tratamos tudo explicitamente.\"",
+      "evidence": "O código força parsing de datas apenas no formato '%Y-%m-%d' (comentário: \"padroniza datas assumindo ISO; o que nao encaixar vira NaT\") e em seguida faz dropna de 'reference_date' e 'total_charges' (df = df.dropna(...)) sem reportar quantas linhas foram descartadas. Isso pode descartar silenciosamente a fatia com o \"outro\" formato de data mencionado no markdown.",
+      "severity": "major"
+    },
+    {
+      "type": "E1",
+      "cell": 9,
+      "claim": "\"Modelo com AUC 0.710 no teste.\"",
+      "evidence": "A célula 8 imprime AUC_TEST=0.700 (run_a) e 0.709 (run_b). A AUC declarada (0.710) não corresponde ao valor efetivamente produzido em run_a; diferença de 0.010 (menor que 0.05), mas o número citado não é o que foi computado/impresso.",
+      "severity": "minor"
+    },
+    {
+      "type": "E3",
+      "cell": 7,
+      "claim": "Reprodutibilidade implícita do resultado do modelo (métrica do teste).",
+      "evidence": "train_test_split não fixa random_state. As métricas variam entre as execuções: AUC_TEST 0.700 vs 0.709 (Δ=0.009), RECALL_TEST 0.084 vs 0.071 (Δ=0.013), ACC_TEST 0.847 vs 0.850 (Δ=0.003).",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 3,
+    "C2": 3,
+    "C3": 3,
+    "C4": 3
+  },
+  "weighted_score": 3.0,
+  "decision": "REVISAR",
+  "summary": "Qualidade geral: notebook organizado e com boas práticas básicas (separa treino/teste antes do ajuste e usa Pipeline), mas com pontos de confiabilidade a revisar. Achado mais importante: a limpeza de dados não corresponde ao que é prometido — as datas são convertidas só em um formato e registros que não encaixam viram “faltantes” e podem ser removidos silenciosamente, o que pode enviesar o resultado. Além disso, o resultado do modelo não é totalmente reprodutível porque não há semente fixa na divisão dos dados, e há pequena divergência entre o número de AUC escrito e o realmente impresso. Na entrevista, verificar como a pessoa validaria e documentaria a limpeza (quantas linhas foram descartadas e por quê), como garantiria reprodutibilidade (random_state) e como sustentaria as conclusões do que “mais influencia” o churn com evidências do próprio modelo.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.7,
+          "RECALL_TEST": 0.084,
+          "ACC_TEST": 0.847
+        },
+        "b": {
+          "AUC_TEST": 0.709,
+          "RECALL_TEST": 0.071,
+          "ACC_TEST": 0.85
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.7,
+          "RECALL_TEST": 0.084,
+          "ACC_TEST": 0.847
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.709,
+          "RECALL_TEST": 0.071,
+          "ACC_TEST": 0.85
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "ok\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.153\ncontract_type\nannual     0.098\nmonthly    0.191\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.700\nRECALL_TEST=0.084\nACC_TEST=0.847\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S4",
+          "cell": 3,
+          "claim": "\"O CSV tem decimais com vírgula, datas em dois formatos e categorias inconsistentes — tratamos tudo explicitamente.\"",
+          "evidence": "O código força parsing de datas apenas no formato '%Y-%m-%d' (comentário: \"padroniza datas assumindo ISO; o que nao encaixar vira NaT\") e em seguida faz dropna de 'reference_date' e 'total_charges' (df = df.dropna(...)) sem reportar quantas linhas foram descartadas. Isso pode descartar silenciosamente a fatia com o \"outro\" formato de data mencionado no markdown.",
+          "severity": "major"
+        },
+        {
+          "type": "E1",
+          "cell": 9,
+          "claim": "\"Modelo com AUC 0.710 no teste.\"",
+          "evidence": "A célula 8 imprime AUC_TEST=0.700 (run_a) e 0.709 (run_b). A AUC declarada (0.710) não corresponde ao valor efetivamente produzido em run_a; diferença de 0.010 (menor que 0.05), mas o número citado não é o que foi computado/impresso.",
+          "severity": "minor"
+        },
+        {
+          "type": "E3",
+          "cell": 7,
+          "claim": "Reprodutibilidade implícita do resultado do modelo (métrica do teste).",
+          "evidence": "train_test_split não fixa random_state. As métricas variam entre as execuções: AUC_TEST 0.700 vs 0.709 (Δ=0.009), RECALL_TEST 0.084 vs 0.071 (Δ=0.013), ACC_TEST 0.847 vs 0.850 (Δ=0.003).",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 3,
+        "C2": 3,
+        "C3": 3,
+        "C4": 3
+      },
+      "justifications": {
+        "C1": "O split é feito antes do fit/transform e o pré-processamento fica dentro de Pipeline/ColumnTransformer (célula 7), e há estratificação no train_test_split. Porém, a limpeza prometida para “datas em dois formatos” não é atendida: o parsing força apenas '%Y-%m-%d' e depois descarta NaT com dropna, potencialmente removendo silenciosamente o “outro” formato citado (célula 3; finding S4 major).",
+        "C2": "O notebook executa de ponta a ponta sem exceções nas células fornecidas (células 1, 3, 7, 8). Mas não fixa random_state no train_test_split, e as métricas variam entre execuções (AUC 0.700 vs 0.709 etc.), indicando reprodutibilidade incompleta (célula 7; finding E3 major), embora a variação não seja >0.05 (não crítico).",
+        "C3": "Há divergência entre o que é escrito e o que o código produz: o texto afirma “AUC 0.710”, enquanto a execução reporta AUC_TEST=0.700 (e em outra execução 0.709), logo o número citado não é o impresso (células 8–9; finding E1 minor). A diferença é pequena (≈0.01), então não muda a conclusão geral, mas afeta a integridade.",
+        "C4": "As conclusões são genéricas e pouco ancoradas em evidências do notebook: não há análise de importância/coeficientes para sustentar “contrato mensal e reclamações lideram o churn” (célula 9) e a performance operacional (recall 0.084 a 0.5 de threshold) não é discutida à luz do objetivo de retenção (célula 8). Ainda assim, há conexão mínima com EDA (churn maior em contrato mensal na célula 5) e com a métrica AUC reportada."
+      }
+    }
+  ]
+}

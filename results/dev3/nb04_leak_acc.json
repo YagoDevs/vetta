@@ -1,0 +1,133 @@
+{
+  "notebook": "nb04_leak_acc.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "\"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+      "evidence": "Na célula 7, antes do train_test_split é executado: `df[num] = StandardScaler().fit_transform(df[num])`, ou seja, o scaler é ajustado (fit) no dataset inteiro e só depois ocorre o split. Isso vaza informação do teste para o treino.",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "\"O modelo alcança accuracy de 0.853 — desempenho excelente, acertando a grande maioria dos clientes. O modelo está pronto para produção.\"",
+      "evidence": "A base é desbalanceada (célula 5: churn rate = 0.157). Apesar de ACC_TEST=0.853 (célula 8), o modelo tem RECALL_TEST=0.119 e AUC_TEST=0.729 (célula 8), indicando que ele quase não identifica churners. A conclusão se apoia em accuracy como evidência principal de 'desempenho excelente' e prontidão para produção, o que é enganoso neste cenário.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 5,
+    "C4": 2
+  },
+  "weighted_score": 3.2,
+  "decision": "REPROVAR",
+  "summary": "Qualidade geral: mediana na execução e reprodução dos resultados, mas com problemas metodológicos que comprometem a confiança no desempenho reportado (decisão: reprovar). O achado mais importante é um vazamento de dados: a padronização das variáveis é “aprendida” usando o conjunto inteiro antes de separar treino e teste, o que pode inflar as métricas. Além disso, a conclusão é mais otimista do que os números permitem: apesar de accuracy alta, o modelo quase não identifica clientes que vão sair (recall muito baixo) em uma base desbalanceada. Na entrevista, verifique se a pessoa sabe explicar e corrigir vazamento (usar pipeline/fit só no treino) e se sabe escolher/interpretar métricas adequadas para churn (recall/precision, AUC e ajuste de limiar) antes de falar em produção.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(remainder='passthrough',\n                                   transformers=[('c',\n                                                  OneHotEncoder(handle_unknown='ignore'),\n                                                  ['region', 'plan_type',\n                                                   'contract_type',\n                                                   'internet_tech'])])),\n                ('clf', LogisticRegression(max_iter=1000"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual      -0.41\nc__contract_type_monthly      0.41\nremainder__tenure_months     -0.39\nremainder__n_support_calls    0.34\nremainder__n_complaints       0.32\nremainder__total_charges     -0.28\nremainder__monthly_charges    0.25\nremainder__late_payment       0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S1",
+          "cell": 7,
+          "claim": "\"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+          "evidence": "Na célula 7, antes do train_test_split é executado: `df[num] = StandardScaler().fit_transform(df[num])`, ou seja, o scaler é ajustado (fit) no dataset inteiro e só depois ocorre o split. Isso vaza informação do teste para o treino.",
+          "severity": "critical"
+        },
+        {
+          "type": "S3",
+          "cell": 10,
+          "claim": "\"O modelo alcança accuracy de 0.853 — desempenho excelente, acertando a grande maioria dos clientes. O modelo está pronto para produção.\"",
+          "evidence": "A base é desbalanceada (célula 5: churn rate = 0.157). Apesar de ACC_TEST=0.853 (célula 8), o modelo tem RECALL_TEST=0.119 e AUC_TEST=0.729 (célula 8), indicando que ele quase não identifica churners. A conclusão se apoia em accuracy como evidência principal de 'desempenho excelente' e prontidão para produção, o que é enganoso neste cenário.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 1,
+        "C2": 5,
+        "C3": 5,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "Há vazamento de dados: na célula 7 o scaler é ajustado no dataset inteiro (`StandardScaler().fit_transform(df[num])`) antes do `train_test_split`, contradizendo o claim de split antes de qualquer transformação (finding S1 crítico).",
+        "C2": "O notebook executa de ponta a ponta sem erros reportados e com `random_state=42` no split e no modelo (células 7–9), produzindo saídas estáveis (AUC/recall/acc na célula 8).",
+        "C3": "As métricas citadas no texto que são numéricas batem com o output: a conclusão menciona accuracy 0.853 e a célula 8 imprime `ACC_TEST=0.853` (tolerância atendida).",
+        "C4": "A conclusão usa accuracy como evidência de “desempenho excelente” e “pronto para produção” apesar de churn rate 0.157 (célula 5) e recall muito baixo 0.119 (célula 8), portanto a narrativa não é suportada pelos números (finding S3, limite em C4)."
+      }
+    }
+  ]
+}

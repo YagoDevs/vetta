@@ -1,0 +1,113 @@
+{
+  "notebook": "nb01_strong.ipynb",
+  "findings": [
+    {
+      "type": "S3",
+      "cell": 8,
+      "claim": "Avaliação do modelo imprime e potencialmente sugere \"ACC_TEST\" como indicador de performance sem discutir desbalanceamento.",
+      "evidence": "EDA mostra churn rate = 0.157 (classe positiva minoritária). Mesmo assim a célula 8 reporta ACC_TEST=0.853 junto com AUC/Recall, sem qualquer ajuste de threshold, métrica balanceada (ex.: F1, PR-AUC) ou discussão do impacto do desbalanceamento; alta acurácia pode ser enganosa nesse cenário.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 3,
+    "C2": 5,
+    "C3": 5,
+    "C4": 3
+  },
+  "weighted_score": 4.0,
+  "decision": "REVISAR",
+  "summary": "Qualidade geral boa: o notebook roda do início ao fim, é reprodutível e evita vazamento de dados ao aprender o pré-processamento apenas no conjunto de treino. O achado mais importante é metodológico: como a taxa de churn é baixa (~16%), a avaliação destaca acurácia (0,85), que pode dar uma impressão otimista sem discutir métricas mais adequadas para classes raras ou ajuste de limiar. Na entrevista, peça para a pessoa explicar como avaliaria e compararia modelos em dados desbalanceados (métricas como recall/precisão, F1/PR-AUC e escolha de threshold) e como definiria o critério de decisão do negócio. Também vale checar como ela sustentaria as conclusões sobre “principais sinais” de churn, mostrando evidências (ex.: importâncias, coeficientes ou análises de impacto) e não apenas uma narrativa.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S3",
+          "cell": 8,
+          "claim": "Avaliação do modelo imprime e potencialmente sugere \"ACC_TEST\" como indicador de performance sem discutir desbalanceamento.",
+          "evidence": "EDA mostra churn rate = 0.157 (classe positiva minoritária). Mesmo assim a célula 8 reporta ACC_TEST=0.853 junto com AUC/Recall, sem qualquer ajuste de threshold, métrica balanceada (ex.: F1, PR-AUC) ou discussão do impacto do desbalanceamento; alta acurácia pode ser enganosa nesse cenário.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 3,
+        "C2": 5,
+        "C3": 5,
+        "C4": 3
+      },
+      "justifications": {
+        "C1": "A célula 7 faz split estratificado antes do pipeline e o pré-processamento (scaler/one-hot) é aprendido só no treino via Pipeline/ColumnTransformer, evitando vazamento. Porém, conforme o finding S3 e a célula 8, o notebook imprime ACC_TEST em um cenário desbalanceado (churn rate 0.157 na célula 5) sem discussão/ajuste de threshold ou métrica mais informativa (ex.: PR-AUC/F1), o que é um descuido metodológico relevante.",
+        "C2": "O notebook executa de ponta a ponta sem erros (células 1, 3, 7 e 8 com outputs consistentes) e define random_state no split e no modelo (célula 7), favorecendo reprodutibilidade. Código está organizado em etapas (limpeza/EDA/modelo) e não depende de execução fora de ordem.",
+        "C3": "O texto da conclusão cita AUC 0.729 (markdown da célula 9), que confere exatamente com o output da célula 8 (AUC_TEST=0.729) dentro da tolerância. Não há afirmações numéricas adicionais conflitantes com os outputs exibidos.",
+        "C4": "A recomendação está conectada ao achado de maior churn em contrato mensal (célula 5) e reconhece limitação importante (ausência de validação temporal) na célula 9. Ainda assim, a conclusão sobre “principais sinais” (reclamações/atraso) não é suportada por evidências mostradas no notebook (não há coeficientes/importâncias/ablação), tornando a comunicação parcialmente genérica e pouco ancorada em números."
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "notebook": "nb01_strong.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 5
+  },
+  "weighted_score": 5.0,
+  "decision": "AVANCAR",
+  "summary": "Nenhum defeito com evidência concreta foi encontrado. Split estratificado ocorre antes de qualquer fit/transform e o pré-processamento está encapsulado em Pipeline/ColumnTransformer (sem leakage). Métrica principal (AUC) é apropriada para desbalanceamento e o notebook também reporta recall/accuracy, reconhecendo a limitação do threshold 0.5. Execução parece reprodutível (random_state fixado no split e no LogisticRegression) e o texto da conclusão coincide com os outputs (AUC 0.729 e interpretação coerente dos coeficientes mostrados). Score ponderado = 5.0; decisão sugerida: AVANÇAR."
+}

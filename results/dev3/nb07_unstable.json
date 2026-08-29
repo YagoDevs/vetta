@@ -1,0 +1,133 @@
+{
+  "notebook": "nb07_unstable.ipynb",
+  "findings": [
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "Markdown conclui: \"Modelo com **AUC 0.734** no teste.\"",
+      "evidence": "A célula 8 imprime AUC_TEST=0.670 (run_a) e 0.712 (run_b). Nenhuma execução reporta 0.734. Diferença vs 0.734 é 0.064 (run_b) a 0.064+ (run_a 0.064), > 0.05.",
+      "severity": "critical"
+    },
+    {
+      "type": "E3",
+      "cell": 7,
+      "claim": "Resultado do modelo no teste (AUC/Recall/ACC) é tratado como estável/definitivo, mas o split não fixa random_state.",
+      "evidence": "train_test_split em cell 7 não define random_state. As métricas variam entre runs: AUC 0.670 -> 0.712 (Δ=0.042), Recall 0.097 -> 0.052 (Δ=0.045), ACC 0.847 -> 0.844 (Δ=0.003). Variação > 0.02 em AUC e Recall.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 2,
+    "C3": 1,
+    "C4": 4
+  },
+  "weighted_score": 3.0,
+  "decision": "REPROVAR",
+  "summary": "Qualidade geral: a estrutura do notebook é razoável (pré-processamento bem organizado e sem indício de vazamento de dados), mas a entrega é inconsistente e por isso foi reprovada. O achado mais importante é uma divergência crítica entre o que o texto afirma e o que o código realmente produz: o notebook declara AUC 0,734, porém as execuções mostradas dão AUC de 0,670 e 0,712. Além disso, os resultados variam de uma execução para outra porque a divisão treino/teste não fixa semente, o que muda AUC e principalmente Recall. Na entrevista, verificar se a pessoa sabe garantir reprodutibilidade (definir random_state, repetir/validar com validação cruzada) e se confere/atualiza conclusões e números do relatório para baterem com as métricas efetivamente obtidas.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.67,
+          "RECALL_TEST": 0.097,
+          "ACC_TEST": 0.847
+        },
+        "b": {
+          "AUC_TEST": 0.712,
+          "RECALL_TEST": 0.052,
+          "ACC_TEST": 0.844
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.67,
+          "RECALL_TEST": 0.097,
+          "ACC_TEST": 0.847
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.712,
+          "RECALL_TEST": 0.052,
+          "ACC_TEST": 0.844
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "ok\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.153\ncontract_type\nannual     0.098\nmonthly    0.191\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.670\nRECALL_TEST=0.097\nACC_TEST=0.847\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "n__tenure_months           -0.45\nc__contract_type_monthly    0.40\nc__contract_type_annual    -0.40\nn__n_support_calls          0.39\nn__n_complaints             0.37\nn__total_charges           -0.29\nn__monthly_charges          0.22\nc__region_South            -0.20\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "E1",
+          "cell": 10,
+          "claim": "Markdown conclui: \"Modelo com **AUC 0.734** no teste.\"",
+          "evidence": "A célula 8 imprime AUC_TEST=0.670 (run_a) e 0.712 (run_b). Nenhuma execução reporta 0.734. Diferença vs 0.734 é 0.064 (run_b) a 0.064+ (run_a 0.064), > 0.05.",
+          "severity": "critical"
+        },
+        {
+          "type": "E3",
+          "cell": 7,
+          "claim": "Resultado do modelo no teste (AUC/Recall/ACC) é tratado como estável/definitivo, mas o split não fixa random_state.",
+          "evidence": "train_test_split em cell 7 não define random_state. As métricas variam entre runs: AUC 0.670 -> 0.712 (Δ=0.042), Recall 0.097 -> 0.052 (Δ=0.045), ACC 0.847 -> 0.844 (Δ=0.003). Variação > 0.02 em AUC e Recall.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 2,
+        "C3": 1,
+        "C4": 4
+      },
+      "justifications": {
+        "C1": "Em cell 7 o split é feito antes de qualquer fit/transform e o pré-processamento está dentro de um Pipeline (StandardScaler/OneHotEncoder aprendem só no treino), sem evidência de leakage; além disso a limpeza de decimais/datas/categorias é explicitada e aplicada em cell 3 e a base é desbalanceada (cell 5) com métrica AUC usada (cell 8).",
+        "C2": "Há instabilidade material entre execuções por falta de random_state no train_test_split (cell 7), com variação relevante em AUC e Recall conforme evidência do finding E3; o notebook roda sem exceções nas células mostradas, então não cai para 1.",
+        "C3": "Falha crítica de integridade: o texto afirma AUC 0.734 em cell 10, mas a execução produz AUC_TEST=0.670 (cell 8; e 0.712 em outra run), divergindo >0.05 conforme finding E1 critical.",
+        "C4": "As conclusões sobre drivers (contrato mensal, reclamações) estão suportadas pelos coeficientes exibidos (cell 9) e a narrativa conecta com o objetivo de churn (cell 10), porém o número central (AUC) está incorreto no texto (cell 10), o que fragiliza a comunicação mesmo sem um finding E4/S3."
+      }
+    }
+  ]
+}

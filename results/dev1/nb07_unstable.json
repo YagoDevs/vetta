@@ -1,0 +1,141 @@
+{
+  "notebook": "nb07_unstable.ipynb",
+  "findings": [
+    {
+      "type": "E1",
+      "cell": 9,
+      "claim": "Markdown declara: \"Modelo com **AUC 0.710** no teste.\"",
+      "evidence": "Na execução (cell 8) foi impresso AUC_TEST=0.737 (run_a). Diferença = 0.027. Porém, entre runs: run_b AUC_TEST=0.711, mostrando que o valor 0.710 não corresponde de forma consistente ao resultado executado.",
+      "severity": "critical"
+    },
+    {
+      "type": "E3",
+      "cell": 7,
+      "claim": "Resultado do modelo (AUC/Recall/Accuracy) implicitamente reprodutível; não há seed fixada no split/modelo.",
+      "evidence": "Métricas variam entre execuções: AUC 0.737 vs 0.711 (Δ=0.026), Recall 0.090 vs 0.045 (Δ=0.045), ACC 0.851 vs 0.848 (Δ=0.003). O split usa train_test_split sem random_state.",
+      "severity": "major"
+    },
+    {
+      "type": "S3",
+      "cell": 8,
+      "claim": "Avaliação do modelo inclui ACC_TEST sem discutir desbalanceamento/baixa sensibilidade.",
+      "evidence": "EDA mostra churn rate = 0.153 (cell 5), base desbalanceada. No teste, Recall muito baixo (0.090 / 0.045) enquanto ACC alto (~0.85), indicando que accuracy é potencialmente enganosa sem contextualização (p.ex., baseline de sempre prever não-churn já daria ~0.847).",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 3,
+    "C3": 1,
+    "C4": 3
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "Qualidade geral abaixo do esperado: o notebook roda, mas os resultados não são confiáveis nem bem interpretados, por isso a decisão foi reprovar. O achado mais importante é que a avaliação do modelo usa “accuracy” com um limiar fixo em uma base desbalanceada (poucos casos de churn), o que gera um número alto (~0,85) mesmo quando o modelo quase não identifica quem vai cancelar (recall muito baixo). Além disso, o texto final apresenta um AUC que não bate com a execução e as métricas mudam entre rodadas por falta de configuração de reprodutibilidade (seed). Na entrevista, verifique se a pessoa sabe escolher métricas adequadas para dados desbalanceados, ajustar limiar/objetivo do modelo e garantir consistência entre o que reporta e o que o código realmente produz.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.737,
+          "RECALL_TEST": 0.09,
+          "ACC_TEST": 0.851
+        },
+        "b": {
+          "AUC_TEST": 0.711,
+          "RECALL_TEST": 0.045,
+          "ACC_TEST": 0.848
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.737,
+          "RECALL_TEST": 0.09,
+          "ACC_TEST": 0.851
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.711,
+          "RECALL_TEST": 0.045,
+          "ACC_TEST": 0.848
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "ok\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.153\ncontract_type\nannual     0.098\nmonthly    0.191\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.737\nRECALL_TEST=0.090\nACC_TEST=0.851\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "E1",
+          "cell": 9,
+          "claim": "Markdown declara: \"Modelo com **AUC 0.710** no teste.\"",
+          "evidence": "Na execução (cell 8) foi impresso AUC_TEST=0.737 (run_a). Diferença = 0.027. Porém, entre runs: run_b AUC_TEST=0.711, mostrando que o valor 0.710 não corresponde de forma consistente ao resultado executado.",
+          "severity": "critical"
+        },
+        {
+          "type": "E3",
+          "cell": 7,
+          "claim": "Resultado do modelo (AUC/Recall/Accuracy) implicitamente reprodutível; não há seed fixada no split/modelo.",
+          "evidence": "Métricas variam entre execuções: AUC 0.737 vs 0.711 (Δ=0.026), Recall 0.090 vs 0.045 (Δ=0.045), ACC 0.851 vs 0.848 (Δ=0.003). O split usa train_test_split sem random_state.",
+          "severity": "major"
+        },
+        {
+          "type": "S3",
+          "cell": 8,
+          "claim": "Avaliação do modelo inclui ACC_TEST sem discutir desbalanceamento/baixa sensibilidade.",
+          "evidence": "EDA mostra churn rate = 0.153 (cell 5), base desbalanceada. No teste, Recall muito baixo (0.090 / 0.045) enquanto ACC alto (~0.85), indicando que accuracy é potencialmente enganosa sem contextualização (p.ex., baseline de sempre prever não-churn já daria ~0.847).",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 1,
+        "C2": 3,
+        "C3": 1,
+        "C4": 3
+      },
+      "justifications": {
+        "C1": "Apesar de usar Pipeline e fazer o split antes do fit (cell 7) e tratar sujeira (cell 3), a avaliação usa limiar fixo 0.5 e reporta ACC em base desbalanceada (churn rate 0.153 na cell 5) sem discussão/mitigação, tornando a métrica potencialmente enganosa (cell 8; finding S3 => crítico para C1 pela rubrica).",
+        "C2": "O notebook executa de ponta a ponta sem exceções (cells 1–8), porém não fixa seeds (train_test_split sem random_state) e as métricas variam entre execuções (finding E3; cells 7–8), o que reduz estabilidade mas não chega ao critério de nota 1 pela rubrica (variação de AUC < 0.05).",
+        "C3": "Há divergência entre o que é escrito e o que o código produz: o markdown afirma AUC 0.710 (cell 9), enquanto a execução mostra AUC_TEST=0.737 (cell 8) e ainda varia entre runs (finding E1 critical).",
+        "C4": "As conclusões são parcialmente conectadas ao EDA (contrato mensal com maior churn na cell 5), mas a conclusão de performance está inconsistente com o output (cell 9 vs cell 8) e não aborda o recall muito baixo (cell 8), ficando genérica e sem recomendação acionável clara."
+      }
+    }
+  ]
+}

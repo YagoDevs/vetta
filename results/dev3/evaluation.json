@@ -1,0 +1,250 @@
+{
+  "agent": {
+    "notebooks": 8,
+    "defects": {
+      "tp": 11,
+      "fp": 3,
+      "fn": 1,
+      "precision": 0.786,
+      "recall": 0.917,
+      "f1": 0.846
+    },
+    "by_class": {
+      "S_static": {
+        "precision": 0.667,
+        "recall": 0.8
+      },
+      "E_executable": {
+        "precision": 0.875,
+        "recall": 1.0
+      }
+    },
+    "decision_accuracy": 1.0,
+    "rows": [
+      {
+        "notebook": "nb01_strong",
+        "expected": "AVANCAR",
+        "got": "AVANCAR",
+        "decision_ok": true,
+        "defects_found": [],
+        "false_positives": [],
+        "missed": []
+      },
+      {
+        "notebook": "nb02_honest",
+        "expected": "AVANCAR",
+        "got": "AVANCAR",
+        "decision_ok": true,
+        "defects_found": [],
+        "false_positives": [],
+        "missed": []
+      },
+      {
+        "notebook": "nb03_inflated",
+        "expected": "REPROVAR",
+        "got": "REPROVAR",
+        "decision_ok": true,
+        "defects_found": [
+          "E1"
+        ],
+        "false_positives": [],
+        "missed": []
+      },
+      {
+        "notebook": "nb04_leak_acc",
+        "expected": "REPROVAR",
+        "got": "REPROVAR",
+        "decision_ok": true,
+        "defects_found": [
+          "S1",
+          "S3"
+        ],
+        "false_positives": [],
+        "missed": []
+      },
+      {
+        "notebook": "nb05_broken",
+        "expected": "REPROVAR",
+        "got": "REPROVAR",
+        "decision_ok": true,
+        "defects_found": [
+          "E2",
+          "E4"
+        ],
+        "false_positives": [
+          "S3"
+        ],
+        "missed": []
+      },
+      {
+        "notebook": "nb06_target",
+        "expected": "REPROVAR",
+        "got": "REPROVAR",
+        "decision_ok": true,
+        "defects_found": [
+          "S2",
+          "E1"
+        ],
+        "false_positives": [],
+        "missed": []
+      },
+      {
+        "notebook": "nb07_unstable",
+        "expected": "REPROVAR",
+        "got": "REPROVAR",
+        "decision_ok": true,
+        "defects_found": [
+          "E3"
+        ],
+        "false_positives": [
+          "E1"
+        ],
+        "missed": [
+          "S4"
+        ]
+      },
+      {
+        "notebook": "nb08_multi",
+        "expected": "REPROVAR",
+        "got": "REPROVAR",
+        "decision_ok": true,
+        "defects_found": [
+          "S1",
+          "E1",
+          "E4"
+        ],
+        "false_positives": [
+          "S3"
+        ],
+        "missed": []
+      }
+    ]
+  },
+  "baseline": {
+    "notebooks": 8,
+    "defects": {
+      "tp": 10,
+      "fp": 6,
+      "fn": 2,
+      "precision": 0.625,
+      "recall": 0.833,
+      "f1": 0.714
+    },
+    "by_class": {
+      "S_static": {
+        "precision": 0.833,
+        "recall": 1.0
+      },
+      "E_executable": {
+        "precision": 0.5,
+        "recall": 0.714
+      }
+    },
+    "decision_accuracy": 0.875,
+    "rows": [
+      {
+        "notebook": "nb01_strong",
+        "expected": "AVANCAR",
+        "got": "AVANCAR",
+        "decision_ok": true,
+        "defects_found": [],
+        "false_positives": [],
+        "missed": []
+      },
+      {
+        "notebook": "nb02_honest",
+        "expected": "AVANCAR",
+        "got": "AVANCAR",
+        "decision_ok": true,
+        "defects_found": [],
+        "false_positives": [
+          "E3"
+        ],
+        "missed": []
+      },
+      {
+        "notebook": "nb03_inflated",
+        "expected": "REPROVAR",
+        "got": "REPROVAR",
+        "decision_ok": true,
+        "defects_found": [
+          "E1"
+        ],
+        "false_positives": [
+          "E4",
+          "S3"
+        ],
+        "missed": []
+      },
+      {
+        "notebook": "nb04_leak_acc",
+        "expected": "REPROVAR",
+        "got": "REPROVAR",
+        "decision_ok": true,
+        "defects_found": [
+          "S1",
+          "S3"
+        ],
+        "false_positives": [],
+        "missed": []
+      },
+      {
+        "notebook": "nb05_broken",
+        "expected": "REPROVAR",
+        "got": "REPROVAR",
+        "decision_ok": true,
+        "defects_found": [
+          "E2",
+          "E4"
+        ],
+        "false_positives": [
+          "E1"
+        ],
+        "missed": []
+      },
+      {
+        "notebook": "nb06_target",
+        "expected": "REPROVAR",
+        "got": "REPROVAR",
+        "decision_ok": true,
+        "defects_found": [
+          "S2"
+        ],
+        "false_positives": [
+          "E4"
+        ],
+        "missed": [
+          "E1"
+        ]
+      },
+      {
+        "notebook": "nb07_unstable",
+        "expected": "REPROVAR",
+        "got": "AVANCAR",
+        "decision_ok": false,
+        "defects_found": [
+          "S4",
+          "E3"
+        ],
+        "false_positives": [],
+        "missed": []
+      },
+      {
+        "notebook": "nb08_multi",
+        "expected": "REPROVAR",
+        "got": "REPROVAR",
+        "decision_ok": true,
+        "defects_found": [
+          "S1",
+          "E4"
+        ],
+        "false_positives": [
+          "E4"
+        ],
+        "missed": [
+          "E1"
+        ]
+      }
+    ]
+  }
+}

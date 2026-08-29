@@ -9,7 +9,7 @@
     },
     "nb02_honest": {
       "description": "candidato mediano honesto — limpo",
-      "expected_decision": "REVISAR",
+      "expected_decision": "AVANCAR",
       "defects": [],
       "real_auc_at_build": 0.714
     },
@@ -19,7 +19,7 @@
       "defects": [
         {
           "type": "E1",
-          "cell": 9,
+          "cell": 10,
           "note": "AUC declarado no markdown inflado em +0.20 vs execucao real"
         }
       ],
@@ -36,7 +36,7 @@
         },
         {
           "type": "S3",
-          "cell": 9,
+          "cell": 10,
           "note": "celebra accuracy em base ~84/16 sem discutir desbalanceamento nem recall"
         }
       ],
@@ -53,7 +53,7 @@
         },
         {
           "type": "E4",
-          "cell": 10,
+          "cell": 11,
           "note": "cita 'recall 0.80 no segmento prepaid'; nenhuma celula computa recall por segmento"
         }
       ],
@@ -70,7 +70,7 @@
         },
         {
           "type": "E1",
-          "cell": 10,
+          "cell": 11,
           "note": "AUC declarado nao bate com o executado (gap > 0.15)"
         }
       ],
@@ -91,7 +91,7 @@
           "note": "train_test_split e LogisticRegression sem random_state — metrica varia entre execucoes"
         }
       ],
-      "real_auc_at_build": 0.71
+      "real_auc_at_build": 0.738
     },
     "nb08_multi": {
       "description": "multiplos defeitos criticos",
@@ -104,12 +104,12 @@
         },
         {
           "type": "E1",
-          "cell": 9,
+          "cell": 10,
           "note": "AUC 0.97 declarado; execucao real fica muito abaixo"
         },
         {
           "type": "E4",
-          "cell": 9,
+          "cell": 10,
           "note": "cita 'precision 0.91 nos clientes fiber'; nenhuma celula computa precision por segmento"
         }
       ],

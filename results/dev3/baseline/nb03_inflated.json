@@ -1,0 +1,35 @@
+{
+  "notebook": "nb03_inflated.ipynb",
+  "findings": [
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "\"O modelo atinge AUC 0.93 no teste\"",
+      "evidence": "Na célula 8 o notebook imprime \"AUC_TEST=0.729\". A diferença é 0.201 (>0.05).",
+      "severity": "critico"
+    },
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "Cita AUC 0.93 no teste.",
+      "evidence": "Nenhuma célula computa ou imprime 0.93; a única AUC calculada (célula 8) é 0.729.",
+      "severity": "critico"
+    },
+    {
+      "type": "S3",
+      "cell": 8,
+      "claim": "Uso de métricas sem discussão de desbalanceamento; ACC reportada como resultado principal implícito.",
+      "evidence": "A base tem churn rate 0.157 (célula 5). No teste, ACC=0.853 (célula 8) com RECALL=0.119, indicando que a acurácia é potencialmente enganosa para o objetivo de detectar churn, e não há discussão/ajuste de limiar ou métrica focada em churn na narrativa.",
+      "severity": "alto"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "REPROVAR. Há divergência grave entre a AUC alegada (0.93) e a AUC realmente calculada (0.729) (E1) e a conclusão cita um número não produzido em nenhuma célula (E4). Além disso, para churn rate 15.7%, o modelo com threshold 0.5 tem recall muito baixo (0.119) e a acurácia reportada pode induzir a erro sem contextualização (S3), tornando a conclusão \"pronto para produção\" não suportada."
+}

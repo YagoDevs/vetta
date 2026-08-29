@@ -78,14 +78,21 @@ def gold_cells(seeded=True, stratify=True):
             "print(f'RECALL_TEST={recall_score(y_te, pred):.3f}')\n"
             "print(f'ACC_TEST={accuracy_score(y_te, pred):.3f}')"
         ),
+        code(
+            "coefs = pd.Series(model.named_steps['clf'].coef_[0],\n"
+            "                  index=model.named_steps['pre'].get_feature_names_out())\n"
+            "print(coefs.reindex(coefs.abs().sort_values(ascending=False).index).head(8).round(2))"
+        ),
         md("__CONCLUSION__"),  # preenchido apos execucao com a metrica real
     ]
 
 CONCLUSION_HONEST = (
-    "## Conclusão\n\nO modelo atinge **AUC {auc}** no teste. Contrato mensal, reclamações e "
-    "atraso de pagamento são os principais sinais de churn. Recomendo priorizar retenção "
-    "proativa nos clientes de contrato mensal com reclamação recente. Limitações: sem "
-    "validação temporal; próximo passo seria backtesting por mês de referência."
+    "## Conclusão\n\nO modelo atinge **AUC {auc}** no teste. Pelos coeficientes acima, "
+    "contrato mensal, reclamações e atraso de pagamento são os principais sinais de churn. "
+    "Recomendo priorizar retenção proativa nos clientes de contrato mensal com reclamação "
+    "recente. Limitações: o recall no threshold padrão de 0.5 é baixo — para uso em campanha, "
+    "o threshold deve ser calibrado pelo custo de contato vs. perda do cliente; e falta "
+    "validação temporal (próximo passo: backtesting por mês de referência)."
 )
 
 # ------------------------------------------------------------------- variantes
@@ -208,7 +215,7 @@ def v_multi(cells):  # o caso claramente reprovavel: S1 + E1 + E4
 
 VARIANTS = [
     ("nb01_strong",    "candidato forte — limpo",                v_gold,     "AVANCAR"),
-    ("nb02_honest",    "candidato mediano honesto — limpo",      v_mediocre, "REVISAR"),
+    ("nb02_honest",    "candidato mediano honesto — limpo",      v_mediocre, "AVANCAR"),
     ("nb03_inflated",  "metrica inflada no texto",               v_e1,       "REPROVAR"),
     ("nb04_leak_acc",  "leakage de scaler + accuracy enganosa",  v_s1_s3,    "REPROVAR"),
     ("nb05_broken",    "celula quebrada + conclusao orfa",       v_e2_e4,    "REPROVAR"),

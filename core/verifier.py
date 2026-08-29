@@ -18,7 +18,9 @@ visiveis no codigo.
 Tipos de defeito (use exatamente estes codigos):
 - S1: fit/transform de preprocessador antes do train/test split (data leakage)
 - S2: feature construida a partir do proprio target
-- S3: metrica enganosa p/ o problema (ex.: celebrar accuracy em base desbalanceada sem discutir)
+- S3: a NARRATIVA (markdown/conclusao) se apoia numa metrica enganosa p/ o problema
+      (ex.: celebrar accuracy em base desbalanceada). Apenas IMPRIMIR varias metricas em
+      celula de codigo NAO e S3 — o defeito esta no argumento, nao no print.
 - S4: perda silenciosa de dados (parse/filtro descarta fatia relevante sem reportar)
 - E1: metrica declarada no texto diverge da metrica real executada (gap > 0.05)
 - E2: celula lanca excecao em execucao limpa

@@ -1,0 +1,103 @@
+{
+  "notebook": "nb02_honest.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 4,
+    "C2": 5,
+    "C3": 5,
+    "C4": 4
+  },
+  "weighted_score": 4.5,
+  "decision": "AVANCAR",
+  "summary": "Qualidade geral boa: o notebook roda do início ao fim, é reprodutível e os resultados reportados batem com os outputs. O ponto mais importante é uma inconsistência: o texto diz que o split foi estratificado, mas o código não estratifica; além disso, a acurácia é apresentada sem discutir o desbalanceamento, o que pode dar uma impressão melhor do que a real. Na entrevista, peça para explicar por que escolheram esse método de divisão e como garantiriam uma avaliação justa (estratificação e métricas além de acurácia). Também vale pedir que justifique a escolha do threshold e como lidaria com o trade-off de recall vs. precisão, já que o recall ficou baixo.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        },
+        "b": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "shape apos limpeza: (6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.714\nRECALL_TEST=0.089\nACC_TEST=0.845\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.45\nc__contract_type_monthly    0.44\nn__tenure_months           -0.39\nn__n_support_calls          0.37\nn__n_complaints             0.32\nn__total_charges           -0.30\nn__late_payment             0.25\nn__monthly_charges          0.23\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": []
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 4,
+        "C2": 5,
+        "C3": 5,
+        "C4": 4
+      },
+      "justifications": {
+        "C1": "O split é feito antes de qualquer fit/transform e o pré-processamento fica dentro do Pipeline (cél. 7), reduzindo risco de vazamento; porém o split não está estratificado apesar do texto afirmar “Split estratificado” (cél. 6–7) e a acurácia é reportada sem contextualizar o desbalanceamento (cél. 8).",
+        "C2": "Notebook executa de ponta a ponta sem erros e com resultados determinísticos (random_state no train_test_split e no LogisticRegression; cél. 7) e outputs são estáveis (cél. 8–9).",
+        "C3": "Os números declarados batem com os produzidos: AUC 0.714 na conclusão (cél. 10) corresponde ao output da cél. 8 (AUC_TEST=0.714), e os coeficientes citados referem-se diretamente ao ranking exibido (cél. 9).",
+        "C4": "Conclusões conectam os principais drivers aos coeficientes (cél. 9–10) e trazem recomendação acionável e limitações (threshold/validação temporal; cél. 10), mas a narrativa poderia amarrar melhor a decisão de threshold ao baixo recall observado e evitar a inconsistência de afirmar estratificação quando não foi aplicada (cél. 6–8)."
+      }
+    }
+  ]
+}

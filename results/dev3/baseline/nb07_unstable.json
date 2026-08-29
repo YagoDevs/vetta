@@ -1,0 +1,28 @@
+{
+  "notebook": "nb07_unstable.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 3,
+      "claim": "\"O CSV tem decimais com vírgula, datas em dois formatos ... tratamos tudo explicitamente.\"",
+      "evidence": "A conversão de data usa `format='%Y-%m-%d'` com `errors='coerce'`, o que força NaT para qualquer linha fora do formato ISO. Em seguida o notebook faz `df = df.dropna(subset=['reference_date', 'total_charges'])` sem reportar quantas linhas foram descartadas. Isso pode remover uma fatia relevante (p.ex. datas no 2º formato citado).",
+      "severity": "high"
+    },
+    {
+      "type": "E3",
+      "cell": 7,
+      "claim": "\"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\" (implica reprodutibilidade do experimento)",
+      "evidence": "`train_test_split(..., stratify=y)` é chamado sem `random_state`. Como há aleatoriedade no split, as métricas (AUC/recall/acc) podem variar entre execuções. Não há seed global fixada.",
+      "severity": "medium"
+    }
+  ],
+  "scores": {
+    "C1": 3,
+    "C2": 3,
+    "C3": 5,
+    "C4": 3
+  },
+  "weighted_score": 3.6,
+  "decision": "AVANCAR",
+  "summary": "Decisão sugerida: REVISAR (score ponderado = 3.6, mas há risco de perda silenciosa de dados na limpeza e falta de reprodutibilidade por ausência de seed). Metodologia de modelagem evita leakage via Pipeline/ColumnTransformer, e as métricas citadas batem com os outputs. Comunicação é ok, mas poderia discutir melhor o forte desbalanceamento/threshold dado recall muito baixo (0.071) e quantificar o impacto das exclusões na limpeza."
+}

@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.2-2025-12-11",
+  "tag": "report_nb02_honest.ipynb",
+  "system": "Voce redige o resumo executivo de uma avaliacao tecnica para uma recrutadora\n(conhecimento tecnico medio). 3-5 frases, portugues claro, sem jargao gratuito.\nDiga: qualidade geral, o achado mais importante (se houver) em termos que ela entenda,\ne o que verificar na entrevista. Tom factual — nem vendedor, nem alarmista.\nResponda APENAS JSON: {\"summary\": \"...\"}",
+  "user": "{\"notebook\": \"nb02_honest.ipynb\", \"decisao\": \"AVANCAR\", \"scores\": {\"C1\": 4, \"C2\": 5, \"C3\": 5, \"C4\": 4}, \"justificativas\": {\"C1\": \"O split é feito antes de qualquer fit/transform e o pré-processamento fica dentro do Pipeline (cél. 7), reduzindo risco de vazamento; porém o split não está estratificado apesar do texto afirmar “Split estratificado” (cél. 6–7) e a acurácia é reportada sem contextualizar o desbalanceamento (cél. 8).\", \"C2\": \"Notebook executa de ponta a ponta sem erros e com resultados determinísticos (random_state no train_test_split e no LogisticRegression; cél. 7) e outputs são estáveis (cél. 8–9).\", \"C3\": \"Os números declarados batem com os produzidos: AUC 0.714 na conclusão (cél. 10) corresponde ao output da cél. 8 (AUC_TEST=0.714), e os coeficientes citados referem-se diretamente ao ranking exibido (cél. 9).\", \"C4\": \"Conclusões conectam os principais drivers aos coeficientes (cél. 9–10) e trazem recomendação acionável e limitações (threshold/validação temporal; cél. 10), mas a narrativa poderia amarrar melhor a decisão de threshold ao baixo recall observado e evitar a inconsistência de afirmar estratificação quando não foi aplicada (cél. 6–8).\"}, \"findings\": []}",
+  "response": {
+    "summary": "Qualidade geral boa: o notebook roda do início ao fim, é reprodutível e os resultados reportados batem com os outputs. O ponto mais importante é uma inconsistência: o texto diz que o split foi estratificado, mas o código não estratifica; além disso, a acurácia é apresentada sem discutir o desbalanceamento, o que pode dar uma impressão melhor do que a real. Na entrevista, peça para explicar por que escolheram esse método de divisão e como garantiriam uma avaliação justa (estratificação e métricas além de acurácia). Também vale pedir que justifique a escolha do threshold e como lidaria com o trade-off de recall vs. precisão, já que o recall ficou baixo."
+  },
+  "usage": {
+    "prompt": 462,
+    "completion": 160
+  }
+}
