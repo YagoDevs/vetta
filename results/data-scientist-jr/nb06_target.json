@@ -1,0 +1,139 @@
+{
+  "notebook": "nb06_target.ipynb",
+  "findings": [
+    {
+      "type": "S2",
+      "cell": 6,
+      "claim": "# feature de risco composta",
+      "evidence": "A feature 'risk_score' é construída usando o próprio target: df['risk_score'] = df['churned'] * df['n_complaints'] + df['late_payment']. Isso injeta informação de churn diretamente em X (vazamento pelo alvo).",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 11,
+      "claim": "\"Com a nova feature de risco, o modelo chega a **AUC 0.99**.\"",
+      "evidence": "A célula 9 computa e imprime AUC_TEST=0.858 (runs a e b). Diferença absoluta = |0.99 - 0.858| = 0.132 (> 0.05).",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 5
+  },
+  "weighted_score": 2.6,
+  "decision": "REPROVAR",
+  "summary": "Qualidade geral: o notebook roda de ponta a ponta e tem reprodutibilidade (mesma semente no split e no modelo), mas há problemas críticos que invalidam o resultado. O achado mais importante é um vazamento de informação: foi criada uma variável (“risk_score”) usando diretamente o rótulo de churn e ela entra no treino, o que faz o modelo parecer melhor do que realmente é. Além disso, o texto afirma AUC 0,99, mas o próprio código mostra AUC de teste 0,858, indicando inconsistência entre o que foi reportado e o que foi medido. Na entrevista, peça para explicar como evitar vazamento de alvo na engenharia de atributos e como garantir que métricas reportadas batem com as métricas calculadas (checagens, versionamento e revisão do notebook).",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.858,
+          "RECALL_TEST": 0.46,
+          "ACC_TEST": 0.913
+        },
+        "b": {
+          "AUC_TEST": 0.858,
+          "RECALL_TEST": 0.46,
+          "ACC_TEST": 0.913
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.858,
+          "RECALL_TEST": 0.46,
+          "ACC_TEST": 0.913
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.858,
+          "RECALL_TEST": 0.46,
+          "ACC_TEST": 0.913
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 6,
+            "outputs": [
+              "count    6000.000000\nmean        0.224167\nstd         0.490873\nmin         0.000000\n25%         0.000000\n50%         0.000000\n75%         0.000000\nmax         4.000000\nName: risk_score, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['risk_score',\n                                                   'tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_call"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "AUC_TEST=0.858\nRECALL_TEST=0.460\nACC_TEST=0.913\n"
+            ]
+          },
+          {
+            "cell": 10,
+            "outputs": [
+              "n__risk_score               4.54\nn__late_payment            -3.11\nn__n_complaints            -1.79\nc__contract_type_annual    -0.47\nc__contract_type_monthly    0.46\nn__tenure_months           -0.38\nn__n_support_calls          0.35\nn__monthly_charges          0.22\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S2",
+          "cell": 6,
+          "claim": "# feature de risco composta",
+          "evidence": "A feature 'risk_score' é construída usando o próprio target: df['risk_score'] = df['churned'] * df['n_complaints'] + df['late_payment']. Isso injeta informação de churn diretamente em X (vazamento pelo alvo).",
+          "severity": "critical"
+        },
+        {
+          "type": "E1",
+          "cell": 11,
+          "claim": "\"Com a nova feature de risco, o modelo chega a **AUC 0.99**.\"",
+          "evidence": "A célula 9 computa e imprime AUC_TEST=0.858 (runs a e b). Diferença absoluta = |0.99 - 0.858| = 0.132 (> 0.05).",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 1,
+        "C2": 5,
+        "C3": 1,
+        "C4": 5
+      },
+      "justifications": {
+        "C1": "Há vazamento crítico: a feature `risk_score` usa diretamente o target (`df['risk_score'] = df['churned'] * ...`) na célula 6, e essa coluna entra em `X` na célula 8 (finding S2).",
+        "C2": "O notebook executa de ponta a ponta sem exceções, e há controle de aleatoriedade no split e no modelo (`random_state=42` nas células 8).",
+        "C3": "O texto declara **AUC 0.99** na célula 11, mas o código executado imprime `AUC_TEST=0.858` na célula 9 (diferença 0.132 > 0.05; finding E1 critical).",
+        "C4": "As conclusões estão coerentes com os números exibidos (células 9 e 10) e fazem uma recomendação causal (engenharia de atributos), sem contradições internas na narrativa além do valor de AUC (que é tratado em C3)."
+      }
+    }
+  ]
+}

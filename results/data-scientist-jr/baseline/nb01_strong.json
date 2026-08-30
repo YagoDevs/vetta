@@ -1,0 +1,13 @@
+{
+  "notebook": "nb01_strong.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 5
+  },
+  "weighted_score": 5.0,
+  "decision": "AVANCAR",
+  "summary": "Nenhum defeito S1-S4/E1-E4 encontrado com base no notebook e outputs fornecidos. Metodologia correta (split estratificado antes do fit dentro de Pipeline/ColumnTransformer), métricas reportadas coerentes com os outputs (AUC 0.729) e conclusões alinhadas (menciona explicitamente recall baixo e necessidade de calibrar threshold, além de limitar por ausência de validação temporal). Execução aparenta ser limpa e determinística (random_state fixado). Score ponderado = 5.0 ⇒ AVANÇAR."
+}

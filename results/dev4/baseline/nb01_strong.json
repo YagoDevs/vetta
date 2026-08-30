@@ -1,0 +1,13 @@
+{
+  "notebook": "nb01_strong.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 5
+  },
+  "weighted_score": 5.0,
+  "decision": "AVANCAR",
+  "summary": "Nenhum defeito com evidência concreta (S1-S4/E1-E4) foi identificado no notebook entregue. Split estratificado ocorre antes do fit do preprocessador e está encapsulado em Pipeline/ColumnTransformer, evitando leakage. Métricas reportadas (AUC=0.729, recall=0.119, accuracy=0.853) batem com os outputs e a narrativa reconhece desbalanceamento/baixo recall e sugere calibração de threshold e validação temporal. Código parece executável de ponta a ponta e com seeds fixadas (train_test_split random_state=42; LogisticRegression random_state=42). Score ponderado = 5.0 → decisão sugerida: AVANÇAR."
+}

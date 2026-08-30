@@ -1,0 +1,28 @@
+{
+  "notebook": "nb04_leak_acc.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "Markdown diz: \"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+      "evidence": "Na célula 7 o candidato executa `df[num] = StandardScaler().fit_transform(df[num])` antes do `train_test_split(...)`. Isso faz o scaler aprender média/desvio usando também o conjunto de teste (data leakage).",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "Conclusão: \"accuracy de 0.853 — desempenho excelente\" e \"pronto para produção\".",
+      "evidence": "O churn rate reportado na célula 5 é 0.157 (base desbalanceada). Apesar de ACC_TEST=0.853 (célula 8), o RECALL_TEST é 0.119, indicando que o modelo quase não identifica churners. A narrativa se apoia em accuracy, métrica potencialmente enganosa aqui.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 4,
+    "C4": 1
+  },
+  "weighted_score": 2.7,
+  "decision": "REPROVAR",
+  "summary": "Decisão sugerida: REPROVAR. Há vazamento de dados (S1: scaler ajustado no dataset inteiro antes do split), o que invalida a avaliação do modelo. Além disso, a conclusão se baseia em accuracy em cenário desbalanceado, enquanto o recall é muito baixo (0.119), tornando a recomendação de \"pronto para produção\" não suportada."
+}

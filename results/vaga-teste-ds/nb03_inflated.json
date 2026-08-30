@@ -1,0 +1,119 @@
+{
+  "notebook": "nb03_inflated.ipynb",
+  "findings": [
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "\"O modelo atinge **AUC 0.93** no teste\"",
+      "evidence": "A célula 8 imprime AUC_TEST=0.729 (runs a e b iguais). Diferença absoluta = |0.93 - 0.729| = 0.201 > 0.05.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 1,
+    "C4": 5
+  },
+  "weighted_score": 3.8,
+  "decision": "REPROVAR",
+  "summary": "Qualidade geral: o notebook está bem estruturado e reprodutível (roda do início ao fim, com split correto e cuidados para evitar vazamento de dados), mas a decisão é reprovar por um problema de confiabilidade na comunicação dos resultados. O achado mais importante é uma divergência crítica: o texto final afirma AUC 0,93, porém o resultado exibido anteriormente no teste é AUC 0,729 — isso muda a leitura de performance do modelo. Na entrevista, peça para o candidato explicar por que ocorreu essa discrepância, como ele validaria e reportaria métricas corretamente (incluindo checar outputs, logs e versões/seed), e como decidiria próximos passos para melhorar o AUC de forma verificável.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.41\nc__contract_type_monthly    0.41\nn__tenure_months           -0.39\nn__n_support_calls          0.33\nn__n_complaints             0.32\nn__total_charges           -0.27\nn__monthly_charges          0.25\nn__late_payment             0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "E1",
+          "cell": 10,
+          "claim": "\"O modelo atinge **AUC 0.93** no teste\"",
+          "evidence": "A célula 8 imprime AUC_TEST=0.729 (runs a e b iguais). Diferença absoluta = |0.93 - 0.729| = 0.201 > 0.05.",
+          "severity": "critical"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 5,
+        "C3": 1,
+        "C4": 5
+      },
+      "justifications": {
+        "C1": "A célula 7 faz split estratificado antes de qualquer transformação e usa Pipeline/ColumnTransformer para garantir que scaler/one-hot aprendem só no treino; a limpeza de decimais/datas/categorias está explícita na célula 3 e a métrica principal (AUC) é adequada ao desbalanceamento mostrado na célula 5 (churn rate 0.157).",
+        "C2": "O notebook executa de ponta a ponta sem erros e com resultados mostrados em outputs (células 1, 3, 5, 8, 9); há controle de aleatoriedade no split e no classificador (célula 7, random_state=42).",
+        "C3": "Há divergência crítica entre o texto e o output: a conclusão na célula 10 afirma AUC 0.93, mas a célula 8 imprime AUC_TEST=0.729 (diferença 0.201 > 0.05), conforme o finding E1 critical.",
+        "C4": "As conclusões e recomendações estão apoiadas pelo resultado de AUC no teste apresentado na célula 8 (AUC_TEST=0.729) e pelos drivers do modelo na célula 9; não há achado S3/E4 para rebaixar narrativa neste critério."
+      }
+    }
+  ]
+}

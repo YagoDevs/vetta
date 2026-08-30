@@ -1,0 +1,21 @@
+{
+  "notebook": "nb07_unstable.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 3,
+      "claim": "\"O CSV tem decimais com vírgula, datas em dois formatos e categorias inconsistentes — tratamos tudo explicitamente.\"",
+      "evidence": "A limpeza força parsing de data com format='%Y-%m-%d' e errors='coerce', convertendo qualquer outro formato em NaT; em seguida executa df = df.dropna(subset=['reference_date','total_charges']). Isso remove linhas com datas no \"outro formato\" (mencionado no texto) sem reportar quantas foram descartadas nem o impacto no churn rate/amostra. Também há coerção numérica com errors='coerce' em total_charges seguida de dropna, igualmente descartando registros sem contabilização.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 4,
+    "C2": 2,
+    "C3": 5,
+    "C4": 3
+  },
+  "weighted_score": 3.7,
+  "decision": "REVISAR",
+  "summary": "Defeitos: S4 (perda silenciosa de dados) na célula 3 ao dropar linhas após parsing restritivo de data/numérico sem quantificar. Pontuação: C1=4 (pipeline e split antes do fit OK; métrica principal AUC adequada para desbalanceamento), C2=2 (resultado depende de seed não fixada em train_test_split e LogisticRegression; pode variar entre execuções), C3=5 (números citados batem com outputs: AUC 0.738), C4=3 (conclusões coerentes com coeficientes, mas pouco acionáveis e sem discussão do recall muito baixo no threshold 0.5). Score ponderado=3.55. Decisão sugerida pelas regras: REVISAR (há critério ≤2 em C2)."
+}

@@ -1,0 +1,147 @@
+{
+  "notebook": "nb08_multi.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "Markdown diz: \"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+      "evidence": "Na célula 7 o código faz `df[num] = StandardScaler().fit_transform(df[num])` ANTES do `train_test_split(...)`, ou seja o scaler é ajustado no dataset inteiro (inclui teste) e só depois ocorre o split. Isso caracteriza data leakage do pré-processamento numérico.",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "Conclusão afirma: \"Excelente resultado: AUC de 0.97\".",
+      "evidence": "A única AUC calculada/impressa no notebook é na célula 8: `AUC_TEST=0.729` (run_a=0.729, run_b=0.729). Diferença absoluta = 0.241 (> 0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "Conclusão afirma: \"precision de 0.91 nos clientes fiber\".",
+      "evidence": "Nenhuma célula computa/imprime precision (nem global nem segmentada para 'fiber'). A célula 8 imprime apenas AUC/RECALL/ACC. Não há filtragem por `internet_tech == 'fiber'` nem cálculo de `precision_score`.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 2
+  },
+  "weighted_score": 2.0,
+  "decision": "REPROVAR",
+  "summary": "Qualidade geral: o notebook roda do começo ao fim e é reprodutível, mas há problemas graves na validade dos resultados e na consistência entre texto e código. O achado mais importante é um “vazamento de dados”: a normalização (StandardScaler) é ajustada usando todo o dataset antes da separação em treino e teste, o que pode inflar as métricas. Além disso, a conclusão apresenta números que não aparecem nos resultados (ex.: cita AUC 0,97, mas a AUC calculada é 0,729) e menciona “precision 0,91 em clientes fiber” sem ter calculado essa métrica ou feito o recorte. Na entrevista, verifique se a pessoa sabe evitar vazamento (pipeline/ajuste só no treino), explicar a diferença entre as métricas e justificar conclusões apenas com evidências que ela de fato mediu e reproduziu.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(remainder='passthrough',\n                                   transformers=[('c',\n                                                  OneHotEncoder(handle_unknown='ignore'),\n                                                  ['region', 'plan_type',\n                                                   'contract_type',\n                                                   'internet_tech'])])),\n                ('clf', LogisticRegression(max_iter=1000"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual      -0.41\nc__contract_type_monthly      0.41\nremainder__tenure_months     -0.39\nremainder__n_support_calls    0.34\nremainder__n_complaints       0.32\nremainder__total_charges     -0.28\nremainder__monthly_charges    0.25\nremainder__late_payment       0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S1",
+          "cell": 7,
+          "claim": "Markdown diz: \"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+          "evidence": "Na célula 7 o código faz `df[num] = StandardScaler().fit_transform(df[num])` ANTES do `train_test_split(...)`, ou seja o scaler é ajustado no dataset inteiro (inclui teste) e só depois ocorre o split. Isso caracteriza data leakage do pré-processamento numérico.",
+          "severity": "critical"
+        },
+        {
+          "type": "E1",
+          "cell": 10,
+          "claim": "Conclusão afirma: \"Excelente resultado: AUC de 0.97\".",
+          "evidence": "A única AUC calculada/impressa no notebook é na célula 8: `AUC_TEST=0.729` (run_a=0.729, run_b=0.729). Diferença absoluta = 0.241 (> 0.05).",
+          "severity": "critical"
+        },
+        {
+          "type": "E4",
+          "cell": 10,
+          "claim": "Conclusão afirma: \"precision de 0.91 nos clientes fiber\".",
+          "evidence": "Nenhuma célula computa/imprime precision (nem global nem segmentada para 'fiber'). A célula 8 imprime apenas AUC/RECALL/ACC. Não há filtragem por `internet_tech == 'fiber'` nem cálculo de `precision_score`.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 1,
+        "C2": 5,
+        "C3": 1,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "Apesar do markdown na célula 6/7 afirmar split antes de transformações, na célula 7 há vazamento: `StandardScaler().fit_transform(df[num])` é ajustado no dataset inteiro antes do `train_test_split(...)` (finding S1).",
+        "C2": "O notebook executa de ponta a ponta sem exceções e com resultados impressos/estáveis (ex.: shape na célula 1, métricas na célula 8), além de `random_state=42` no split e no modelo (célula 7).",
+        "C3": "Há divergência crítica entre o que é escrito e o que o código produz: a conclusão cita **AUC=0.97** (célula 10), mas a única AUC calculada é **0.729** (célula 8), diferença > 0.05 (finding E1 critical).",
+        "C4": "A conclusão na célula 10 não é suportada pelos outputs: afirma “precision de 0.91 nos clientes fiber” sem qualquer cálculo de precision nem recorte por `internet_tech=='fiber'` (finding E4), então a narrativa não está ancorada nas evidências apresentadas."
+      }
+    }
+  ]
+}

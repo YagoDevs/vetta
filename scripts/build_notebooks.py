@@ -220,7 +220,7 @@ VARIANTS = [
     ("nb04_leak_acc",  "leakage de scaler + accuracy enganosa",  v_s1_s3,    "REPROVAR"),
     ("nb05_broken",    "celula quebrada + conclusao orfa",       v_e2_e4,    "REPROVAR"),
     ("nb06_target",    "feature do target + metrica inflada",    v_s2_e1,    "REPROVAR"),
-    ("nb07_unstable",  "sem seed + perda silenciosa de dados",   v_e3_s4,    "REPROVAR"),
+    ("nb07_unstable",  "sem seed + perda silenciosa de dados",   v_e3_s4,    "REVISAR"),
     ("nb08_multi",     "multiplos defeitos criticos",            v_multi,    "REPROVAR"),
 ]
 

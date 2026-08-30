@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.2-2025-12-11",
+  "tag": "report_nb01_strong.ipynb",
+  "system": "Voce redige o resumo executivo de uma avaliacao tecnica para uma recrutadora\n(conhecimento tecnico medio). 3-5 frases, portugues claro, sem jargao gratuito.\nDiga: qualidade geral, o achado mais importante (se houver) em termos que ela entenda,\ne o que verificar na entrevista. Tom factual — nem vendedor, nem alarmista.\nResponda APENAS JSON: {\"summary\": \"...\"}",
+  "user": "{\"notebook\": \"nb01_strong.ipynb\", \"decisao\": \"AVANCAR\", \"scores\": {\"C1\": 5, \"C2\": 5, \"C3\": 5, \"C4\": 5}, \"justificativas\": {\"C1\": \"A célula 7 faz split estratificado antes do fit e encapsula transformações em Pipeline/ColumnTransformer, evitando leakage; a limpeza de decimais/datas/categorias e imputações está explícita na célula 3. Métricas incluem AUC (célula 8), apropriada para desbalanceamento, e o texto reconhece o problema de threshold/recall (célula 10).\", \"C2\": \"O notebook executa de ponta a ponta sem erros (células 1, 3, 7–9) e usa random_state no split e no modelo (célula 7), garantindo estabilidade. Código está organizado em etapas claras (limpeza/EDA/modelo/métricas).\", \"C3\": \"A conclusão declara AUC 0.729 (célula 10), que bate exatamente com o output executado AUC_TEST=0.729 (célula 8, e metricas_reais). A interpretação dos principais sinais é suportada pelos maiores coeficientes mostrados (célula 9).\", \"C4\": \"As conclusões conectam evidências (AUC e coeficientes das células 8–9) a uma recomendação acionável (foco em contrato mensal com reclamação/atraso) e citam limitações relevantes (recall baixo e necessidade de validação temporal) na célula 10.\"}, \"findings\": []}",
+  "response": {
+    "summary": "Qualidade geral muito boa: o notebook está bem estruturado, roda do início ao fim sem erros e os resultados são consistentes com as saídas do código. O ponto mais importante é que a pessoa evitou “vazar” informação do conjunto de teste ao fazer a separação dos dados antes do treino e concentrar os tratamentos em um fluxo único, o que aumenta a confiabilidade da avaliação. O desempenho reportado (AUC 0,729) está bem justificado, e ela reconhece limitações práticas como a escolha de limiar e o possível recall baixo. Na entrevista, vale checar como ela escolheria o threshold com base no custo do erro (ex.: priorizar recall vs. precisão), e como faria uma validação temporal/produção para garantir que o modelo se mantém estável ao longo do tempo."
+  },
+  "usage": {
+    "prompt": 468,
+    "completion": 178
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "notebook": "nb06_target.ipynb",
+  "findings": [
+    {
+      "type": "S2",
+      "cell": 6,
+      "claim": "Feature de risco composta",
+      "evidence": "A célula define `df['risk_score'] = df['churned'] * df['n_complaints'] + df['late_payment']`, ou seja, a feature usa diretamente o próprio target (`churned`). Isso injeta informação do rótulo em X (vazamento por construção de feature).",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "\"Com a nova feature de risco, o modelo chega a AUC 0.99\"",
+      "evidence": "A única AUC computada/impressa no notebook está na célula 9: `AUC_TEST=0.858`. Não há nenhuma célula que produza 0.99.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "REPROVAR. Há vazamento crítico por feature construída a partir do target (S2), invalidando o treino/avaliação. Além disso, a conclusão cita AUC 0.99 que não é produzido por nenhuma célula e diverge do AUC_TEST=0.858 (E4), derrubando a integridade e a comunicação dos resultados. Score ponderado = 0.30*1 + 0.20*5 + 0.30*1 + 0.20*1 = 1.8."
+}

@@ -1,0 +1,103 @@
+{
+  "notebook": "nb01_strong.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 5
+  },
+  "weighted_score": 5.0,
+  "decision": "AVANCAR",
+  "summary": "Qualidade geral: alta; o notebook está bem estruturado, roda do início ao fim sem erros e as conclusões batem com os resultados mostrados. O achado mais importante é o cuidado em evitar “vazamento” de dados (treinar com informação do futuro), separando treino e teste antes das transformações e aplicando as transformações só com base no treino, o que torna as métricas mais confiáveis. Também há boa atenção a dados “sujos” e a uma base desbalanceada, usando AUC além de accuracy; porém, com o corte padrão (0,5) o modelo tem recall baixo, ou seja, pode deixar passar parte dos clientes que iriam churnar. Na entrevista, verifique como a pessoa escolheria/ajustaria o threshold e lidaria com o trade-off entre recall e falsos positivos, e como faria a validação temporal/backtesting para garantir que o desempenho se mantém ao longo do tempo.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.41\nc__contract_type_monthly    0.41\nn__tenure_months           -0.39\nn__n_support_calls          0.33\nn__n_complaints             0.32\nn__total_charges           -0.27\nn__monthly_charges          0.25\nn__late_payment             0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": []
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 5,
+        "C3": 5,
+        "C4": 5
+      },
+      "justifications": {
+        "C1": "A célula 7 faz split estratificado antes de qualquer transformação e usa Pipeline/ColumnTransformer para aprender scaler/one-hot só no treino, evitando vazamento (cél. 6–7). Também trata explicitamente sujeira (vírgula decimal, datas mistas, categorias) e missing (cél. 3) e usa AUC além de accuracy para base desbalanceada (~0.157 de churn na cél. 5 e métricas na cél. 8).",
+        "C2": "O notebook executa de ponta a ponta sem erros e com resultados estáveis: random_state fixado no split e no LogisticRegression (cél. 7) e todas as células produzem output esperado (cél. 1, 3, 5, 8, 9).",
+        "C3": "Os números declarados no texto batem com os outputs executados: a conclusão cita AUC 0.729 e a célula 8 imprime AUC_TEST=0.729 (cél. 10 vs. cél. 8). As evidências de coeficientes mencionadas na conclusão correspondem à tabela exibida na cél. 9.",
+        "C4": "As conclusões estão ancoradas em evidências (AUC no teste e coeficientes) e viram recomendação acionável segmentando contrato mensal e sinais de reclamação/atraso (cél. 9–10). Também reconhece limitação relevante (recall baixo no threshold 0.5 mostrado na cél. 8) e aponta próximo passo coerente (validação temporal/backtesting) (cél. 10)."
+      }
+    }
+  ]
+}

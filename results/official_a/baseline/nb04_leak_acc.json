@@ -1,0 +1,28 @@
+{
+  "notebook": "nb04_leak_acc.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "\"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+      "evidence": "Na célula 7 há normalização antes do split: `df[num] = StandardScaler().fit_transform(df[num])` ocorre antes de `train_test_split(...)`, fazendo o scaler aprender estatísticas (média/desvio) do dataset inteiro, incluindo o teste.",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "\"accuracy de 0.853 — desempenho excelente\" como base para dizer que o modelo está pronto.",
+      "evidence": "A base tem churn rate 0.157 (célula 5), logo é desbalanceada. No teste, o modelo tem `ACC_TEST=0.853` mas `RECALL_TEST=0.119` (célula 8), indicando que a accuracy está inflada por acertar majoritariamente a classe negativa e falha em capturar churners. A narrativa se apoia na métrica enganosa.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 3,
+    "C4": 1
+  },
+  "weighted_score": 2.4,
+  "decision": "REPROVAR",
+  "summary": "REPROVAR. Há vazamento de dados (S1) por padronizar numéricas antes do split, contrariando a própria alegação metodológica. A conclusão se apoia em accuracy em base desbalanceada e ignora recall muito baixo (0.119), levando a recomendação incorreta de 'pronto para produção'. Score ponderado = 0.30*1 + 0.20*5 + 0.30*3 + 0.20*1 = 2.40."
+}

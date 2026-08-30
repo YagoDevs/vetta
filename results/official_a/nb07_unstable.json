@@ -1,0 +1,119 @@
+{
+  "notebook": "nb07_unstable.ipynb",
+  "findings": [
+    {
+      "type": "E3",
+      "cell": 10,
+      "claim": "Modelo com **AUC 0.712** no teste.",
+      "evidence": "A métrica varia entre execuções: run_a AUC_TEST=0.701 e run_b AUC_TEST=0.737 (diferença 0.036 > 0.02). O código não fixa random_state no train_test_split nem no LogisticRegression, então o resultado depende da seed.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 2,
+    "C3": 4,
+    "C4": 5
+  },
+  "weighted_score": 4.1,
+  "decision": "REVISAR",
+  "summary": "Qualidade geral boa: o notebook está organizado, evita vazamento de dados e traz uma explicação coerente dos principais fatores do churn. O achado mais importante é que os resultados não são reprodutíveis: a AUC muda de forma relevante entre execuções porque não há controle de aleatoriedade (seed), então o número reportado pode variar. Há também uma pequena divergência entre a AUC citada no texto e a exibida no output. Na entrevista, verifique se a pessoa sabe como garantir reprodutibilidade (definir random_state/seed e manter o pipeline consistente) e como validaria o desempenho de forma mais estável (ex.: validação cruzada e reporte de variação/intervalos).",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.701,
+          "RECALL_TEST": 0.123,
+          "ACC_TEST": 0.848
+        },
+        "b": {
+          "AUC_TEST": 0.737,
+          "RECALL_TEST": 0.071,
+          "ACC_TEST": 0.85
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.701,
+          "RECALL_TEST": 0.123,
+          "ACC_TEST": 0.848
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.737,
+          "RECALL_TEST": 0.071,
+          "ACC_TEST": 0.85
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "ok\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.153\ncontract_type\nannual     0.098\nmonthly    0.191\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.701\nRECALL_TEST=0.123\nACC_TEST=0.848\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_monthly    0.45\nc__contract_type_annual    -0.44\nn__tenure_months           -0.41\nn__n_complaints             0.37\nn__n_support_calls          0.34\nn__total_charges           -0.25\nn__late_payment             0.25\nn__monthly_charges          0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "E3",
+          "cell": 10,
+          "claim": "Modelo com **AUC 0.712** no teste.",
+          "evidence": "A métrica varia entre execuções: run_a AUC_TEST=0.701 e run_b AUC_TEST=0.737 (diferença 0.036 > 0.02). O código não fixa random_state no train_test_split nem no LogisticRegression, então o resultado depende da seed.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 2,
+        "C3": 4,
+        "C4": 5
+      },
+      "justifications": {
+        "C1": "O split é feito antes de qualquer fit/transform e o pré-processamento está dentro de um Pipeline (cél. 7), evitando vazamento; além disso há estratificação no train_test_split e limpeza explícita de decimais/datas/categorias (cél. 3).",
+        "C2": "Há instabilidade entre execuções por falta de random_state no train_test_split (e o finding E3 confirma variação material da AUC entre runs) (cél. 7–8), então a execução não é estável/reprodutível.",
+        "C3": "O texto declara AUC 0.712 (cél. 10), mas o output executado mostrado é AUC_TEST=0.701 (cél. 8), divergindo em 0.011; como não há finding E1 e a discrepância é pequena, fica como divergência menor.",
+        "C4": "As conclusões sobre drivers (contrato mensal, reclamações) estão suportadas pelos coeficientes exibidos (cél. 9) e a comunicação responde ao objetivo de prever churn com métrica reportada e interpretação do modelo (cél. 8–10)."
+      }
+    }
+  ]
+}

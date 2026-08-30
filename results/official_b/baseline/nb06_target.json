@@ -1,0 +1,28 @@
+{
+  "notebook": "nb06_target.ipynb",
+  "findings": [
+    {
+      "type": "S2",
+      "cell": 6,
+      "claim": "# feature de risco composta",
+      "evidence": "A feature é construída usando o próprio target: df['risk_score'] = df['churned'] * df['n_complaints'] + df['late_payment']. Isso injeta o rótulo em X e cria vazamento direto.",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "\"Com a nova feature de risco, o modelo chega a AUC 0.99.\"",
+      "evidence": "A única célula que computa AUC no teste imprime AUC_TEST=0.858 (célula 9). Não há nenhuma célula computando 0.99.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "Decisão sugerida: REPROVAR. Motivos determinísticos: (i) defeito crítico S2 (feature deriva do target) invalida a metodologia; (ii) integridade quebrada: a conclusão cita AUC 0.99 que não é produzido por nenhuma célula (AUC_TEST exibido é 0.858), levando C3=1. Apesar do notebook executar e ter seeds fixadas, as conclusões ficam não confiáveis e não suportadas pelos outputs."
+}

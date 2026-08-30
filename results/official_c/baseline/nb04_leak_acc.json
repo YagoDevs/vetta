@@ -1,0 +1,28 @@
+{
+  "notebook": "nb04_leak_acc.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "Markdown na célula 6: \"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+      "evidence": "Na célula 7, antes do train_test_split, o candidato executa: `df[num] = StandardScaler().fit_transform(df[num])`, ou seja, o scaler é ajustado no dataset inteiro (incluindo o futuro teste). Isso caracteriza leakage de preprocessing.",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "Conclusão: \"accuracy de 0.853 — desempenho excelente\" e \"pronto para produção\".",
+      "evidence": "A base tem churn rate 0.157 (célula 5), portanto é desbalanceada. A avaliação principal usada na narrativa é accuracy (0.853 na célula 8), que pode ser inflada nesse cenário. Além disso, o recall no threshold 0.5 é 0.119 (célula 8), indicando baixa captura de churners — contradiz a ideia de 'desempenho excelente' para o objetivo de churn.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 4,
+    "C4": 2
+  },
+  "weighted_score": 2.9,
+  "decision": "REPROVAR",
+  "summary": "Decisão sugerida: REPROVAR. Motivo determinístico: C1=1 por vazamento (S1: StandardScaler ajustado antes do split). Apesar do notebook executar e as métricas citadas baterem com os outputs, a conclusão se apoia em accuracy em base desbalanceada e ignora recall muito baixo (0.119), enfraquecendo a recomendação de prontidão para produção. Score ponderado = 0.30*1 + 0.20*5 + 0.30*4 + 0.20*2 = 2.90 (ainda assim reprova por critério=1)."
+}

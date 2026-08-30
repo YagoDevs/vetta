@@ -1,0 +1,28 @@
+{
+  "notebook": "nb04_leak_acc.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "\"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+      "evidence": "Na célula 7 o candidato executa `df[num] = StandardScaler().fit_transform(df[num])` antes do `train_test_split(...)`. Isso ajusta o scaler no dataset inteiro (incluindo teste), causando vazamento de informação.",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "\"O modelo alcança accuracy de 0.853 — desempenho excelente, acertando a grande maioria dos clientes. O modelo está pronto para produção.\"",
+      "evidence": "A base tem churn rate 0.157 (célula 5), logo é desbalanceada. Apesar de ACC_TEST=0.853 (célula 8), o RECALL_TEST=0.119 (célula 8) indica que o modelo quase não captura churners. A narrativa se apoia em accuracy e chama de \"excelente\" ignorando a baixa sensibilidade.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 4,
+    "C3": 4,
+    "C4": 1
+  },
+  "weighted_score": 2.5,
+  "decision": "REPROVAR",
+  "summary": "Decisão sugerida: REPROVAR. Motivos determinísticos: C1=1 e C4=1. Há vazamento (StandardScaler fitado antes do split). Além disso, a conclusão usa accuracy como prova de \"desempenho excelente\" e \"pronto para produção\" numa base desbalanceada, contradita pelo recall de 0.119 (modelo falha em identificar churn). Score ponderado = 0.30*1 + 0.20*4 + 0.30*4 + 0.20*1 = 2.5 (limite inferior), mas a regra de reprovação já se aplica por critério=1."
+}

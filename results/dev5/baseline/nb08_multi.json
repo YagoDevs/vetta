@@ -1,0 +1,35 @@
+{
+  "notebook": "nb08_multi.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "\"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+      "evidence": "Na célula 7 há `df[num] = StandardScaler().fit_transform(df[num])` ANTES do `train_test_split(...)`, ou seja, o scaler foi fitado no dataset inteiro (treino+teste), causando leakage.",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "\"Excelente resultado: AUC de 0.97 e precision de 0.91 nos clientes fiber\"",
+      "evidence": "A única AUC computada no notebook é `AUC_TEST=0.729` (célula 8). Não existe nenhuma célula que compute precision (nem segmentação por `internet_tech == fiber`) e, portanto, não há como suportar \"precision 0.91\".",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "\"AUC de 0.97\"",
+      "evidence": "Output executado mostra `AUC_TEST=0.729` (célula 8). Divergência de 0.241 (>0.05).",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "REPROVAR. Vazamento de dados por padronização antes do split (S1). Conclusão traz métricas não computadas e AUC incompatível com o output (E4/E1), tornando os resultados e recomendações não suportados."
+}

@@ -1,0 +1,154 @@
+{
+  "notebook": "nb05_broken.ipynb",
+  "findings": [
+    {
+      "type": "E2",
+      "cell": 8,
+      "claim": "A célula de \"analise por segmento\" executa uma ordenação de importâncias (seg = importancias.sort_values...).",
+      "evidence": "Execução falha na célula 8 com: \"NameError: name 'importancias' is not defined\"; além disso, executed_ok=false e error_cells aponta a célula 8.",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "\"recall de 0.80 no segmento prepaid\".",
+      "evidence": "Nenhuma célula calcula recall por segmento/\"prepaid\". A única métrica de recall computada é global no teste (célula 9): RECALL_TEST=0.119. Não existe métrica por segmento nem filtro por plan_type/contract_type prepaid em outputs.",
+      "severity": "major"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "\"As importâncias de variáveis confirmam tenure e reclamações como principais fatores.\"",
+      "evidence": "Nenhuma célula computa/mostra \"importâncias\". A tentativa de usar a variável importancias na célula 8 falha (NameError). A célula 10 imprime coeficientes do modelo, não um objeto nomeado/derivado como \"importancias\" nem uma análise de importância por segmento.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 1,
+    "C3": 5,
+    "C4": 2
+  },
+  "weighted_score": 3.6,
+  "decision": "REPROVAR",
+  "summary": "Qualidade geral abaixo do esperado: há pontos positivos no cuidado com o preparo dos dados e na forma correta de separar treino/teste, mas o trabalho não fecha ponta a ponta. O achado mais importante é que o notebook quebra na execução (erro por variável não definida), o que impede reproduzir a análise e os resultados. Além disso, a conclusão traz afirmações que não aparecem em nenhum cálculo (por exemplo, “recall 0,80 no segmento prepaid” e “importâncias de variáveis”), enquanto a métrica de recall mostrada é bem baixa. Na entrevista, verifique se a pessoa consegue depurar e corrigir o erro rapidamente e se consegue justificar conclusões apenas com evidências geradas (incluindo como faria a análise por segmento e como apresentaria importâncias de variáveis de forma consistente).",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": false,
+      "error_cells": [
+        8
+      ],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": false,
+        "error_cells": [
+          {
+            "cell": 8,
+            "error": "NameError: name 'importancias' is not defined"
+          }
+        ],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 10,
+            "outputs": [
+              "c__contract_type_annual    -0.41\nc__contract_type_monthly    0.41\nn__tenure_months           -0.39\nn__n_support_calls          0.33\nn__n_complaints             0.32\nn__total_charges           -0.27\nn__monthly_charges          0.25\nn__late_payment             0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "E2",
+          "cell": 8,
+          "claim": "A célula de \"analise por segmento\" executa uma ordenação de importâncias (seg = importancias.sort_values...).",
+          "evidence": "Execução falha na célula 8 com: \"NameError: name 'importancias' is not defined\"; além disso, executed_ok=false e error_cells aponta a célula 8.",
+          "severity": "critical"
+        },
+        {
+          "type": "E4",
+          "cell": 11,
+          "claim": "\"recall de 0.80 no segmento prepaid\".",
+          "evidence": "Nenhuma célula calcula recall por segmento/\"prepaid\". A única métrica de recall computada é global no teste (célula 9): RECALL_TEST=0.119. Não existe métrica por segmento nem filtro por plan_type/contract_type prepaid em outputs.",
+          "severity": "major"
+        },
+        {
+          "type": "E4",
+          "cell": 11,
+          "claim": "\"As importâncias de variáveis confirmam tenure e reclamações como principais fatores.\"",
+          "evidence": "Nenhuma célula computa/mostra \"importâncias\". A tentativa de usar a variável importancias na célula 8 falha (NameError). A célula 10 imprime coeficientes do modelo, não um objeto nomeado/derivado como \"importancias\" nem uma análise de importância por segmento.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 1,
+        "C3": 5,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "O split é estratificado e ocorre antes de qualquer fit/transform (célula 7: train_test_split antes do Pipeline fit), e o pré-processamento fica dentro do Pipeline (StandardScaler/OneHotEncoder aprendem só no treino). Também há tratamento explícito de sujeira (vírgula decimal, datas mistas e categorias) na célula 3 e uso de AUC/recall além de accuracy na célula 9.",
+        "C2": "O notebook não executa ponta a ponta: a célula 8 falha com NameError porque 'importancias' não foi definida (finding E2 critical; célula 8). Isso caracteriza exceção em execução e derruba o critério para 1.",
+        "C3": "Sem findings E1 (inconsistência entre números declarados e produzidos), as métricas numéricas calculadas no código batem com os outputs do próprio notebook (célula 9 reporta AUC_TEST=0.729, RECALL_TEST=0.119, ACC_TEST=0.853). As divergências apontadas são de narrativa/conclusão (E4), não de discrepância de números executados vs. números declarados em células de métricas.",
+        "C4": "A conclusão faz afirmações não suportadas pelos resultados gerados: cita 'recall de 0.80 no segmento prepaid' sem qualquer cálculo por segmento, e o recall que existe é global e baixo (célula 9: RECALL_TEST=0.119; finding E4 na célula 11). Também menciona 'importâncias' que não são calculadas/mostradas (célula 8 falha; célula 10 mostra coeficientes, mas não a análise referida; finding E4), então a narrativa fica desconectada das evidências (limite C4<=2 por E4)."
+      }
+    }
+  ]
+}

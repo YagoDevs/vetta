@@ -1,0 +1,28 @@
+{
+  "notebook": "nb07_unstable.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 3,
+      "claim": "A limpeza foi feita “explicitamente”, mas não há reporte de quantas linhas foram descartadas.",
+      "evidence": "O código faz `df = df.dropna(subset=['reference_date', 'total_charges'])` após converter `reference_date` com `errors='coerce'` (datas fora do formato viram NaT) e `total_charges` com `errors='coerce'` (valores não parseáveis viram NaN). Não há célula mostrando antes/depois (ex.: shape) ou % removida, então pode haver perda relevante de dados sem transparência.",
+      "severity": "major"
+    },
+    {
+      "type": "E3",
+      "cell": 7,
+      "claim": "O notebook implica resultados estáveis, mas o split não fixa seed.",
+      "evidence": "`train_test_split(..., stratify=y)` não define `random_state`. Isso torna AUC/recall/accuracy dependentes do sorteio; os valores reportados podem variar em reexecuções.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 4,
+    "C2": 3,
+    "C3": 5,
+    "C4": 3
+  },
+  "weighted_score": 3.9,
+  "decision": "REVISAR",
+  "summary": "Score ponderado = 0.30*4 + 0.20*3 + 0.30*5 + 0.20*3 = 3.90. Decisão sugerida: AVANÇAR (nenhum critério ≤2). Metodologia de split/pipeline está correta e evita leakage; porém há risco de instabilidade por seed não fixada e perda de linhas na limpeza sem quantificação. Resultados citados no texto batem com o output (AUC 0.712). Conclusões são coerentes, mas poderiam conectar melhor o baixo recall (0.077) à decisão de threshold/objetivo de negócio."
+}

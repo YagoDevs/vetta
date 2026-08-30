@@ -1,0 +1,28 @@
+{
+  "notebook": "nb04_leak_acc.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "Markdown cell 6: \"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+      "evidence": "Na célula 7, o candidato executa `df[num] = StandardScaler().fit_transform(df[num])` antes de `train_test_split(...)`. Isso faz o scaler “aprender” média/desvio do dataset inteiro (incluindo teste), caracterizando leakage.",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "Conclusão: \"accuracy de 0.853 — desempenho excelente... pronto para produção.\"",
+      "evidence": "A base é desbalanceada (célula 5: churn rate 0.157). Apesar da ACC=0.853 (célula 8), o RECALL_TEST é 0.119 (célula 8), indicando que o modelo quase não identifica churners. A narrativa se apoia em accuracy como evidência principal de sucesso, o que é enganoso neste contexto.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 5,
+    "C4": 1
+  },
+  "weighted_score": 3.0,
+  "decision": "REPROVAR",
+  "summary": "REPROVAR. Há vazamento de dados por padronização (StandardScaler) aplicada antes do split (S1), contrariando a própria alegação metodológica. Além disso, a conclusão usa accuracy como prova de “desempenho excelente” em um problema desbalanceado, ignorando recall muito baixo (S3), levando a recomendação de produção não suportada pelos números. Score ponderado = 0.30*1 + 0.20*5 + 0.30*5 + 0.20*1 = 3.00 (ainda assim reprova por C1=1 e C4=1)."
+}

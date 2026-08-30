@@ -1,0 +1,28 @@
+{
+  "notebook": "nb06_target.ipynb",
+  "findings": [
+    {
+      "type": "S2",
+      "cell": 6,
+      "claim": "Criação de \"feature de risco composta\" para usar no modelo.",
+      "evidence": "Na célula 6: df['risk_score'] = df['churned'] * df['n_complaints'] + df['late_payment'] usa diretamente o próprio target (churned) dentro de uma feature de entrada. Isso injeta informação do rótulo em X e invalida a avaliação do modelo.",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "\"Com a nova feature de risco, o modelo chega a AUC 0.99\".",
+      "evidence": "A única AUC computada no notebook está na célula 9: AUC_TEST=0.858. Nenhuma célula calcula/mostra AUC 0.99.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 4,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.6,
+  "decision": "REPROVAR",
+  "summary": "Há vazamento crítico por feature construída a partir do target (S2) e a conclusão cita uma AUC (0.99) que não é produzida por nenhuma célula (E4). Apesar de o pipeline evitar leakage de preprocessamento pós-split e de haver seeds fixadas, a integridade metodológica e a coerência texto↔outputs ficam comprometidas. Decisão sugerida pela rubrica: REPROVAR (C1=1 e C3=1)."
+}

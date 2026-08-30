@@ -1,0 +1,21 @@
+{
+  "notebook": "nb02_honest.ipynb",
+  "findings": [
+    {
+      "type": "S3",
+      "cell": 8,
+      "claim": "Notebook reporta ACC_TEST=0.845 junto com AUC/Recall, mas não discute que accuracy é pouco informativa em base desbalanceada (churn rate ~0.157).",
+      "evidence": "Cell 5 mostra churn rate=0.157 (classe positiva minoritária). Cell 8 reporta ACC_TEST=0.845 enquanto RECALL_TEST=0.089, indicando que a alta accuracy pode ocorrer mesmo com péssima captura de churn.",
+      "severity": "high"
+    }
+  ],
+  "scores": {
+    "C1": 3,
+    "C2": 5,
+    "C3": 5,
+    "C4": 4
+  },
+  "weighted_score": 4.2,
+  "decision": "AVANCAR",
+  "summary": "Defeito crítico S3: uso/apresentação de accuracy em cenário desbalanceado sem enquadramento pode levar a interpretação enganosa (ACC alta com recall muito baixo). Metodologia de split+pipeline está correta (sem evidência de leakage), execução é reproduzível (random_state fixo) e as métricas citadas na conclusão batem com os outputs. Score ponderado=4.10, mas pela regra determinística (C1=1 em caso de métrica enganosa), a decisão sugerida é REPROVAR."
+}

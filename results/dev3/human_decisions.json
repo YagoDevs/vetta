@@ -2,5 +2,9 @@
   "nb03_inflated": {
     "decision": "REPROVAR",
     "note": "metrica inflada confirmada na celula 9"
+  },
+  "nb01_strong": {
+    "decision": "AVANCAR",
+    "note": ""
   }
 }

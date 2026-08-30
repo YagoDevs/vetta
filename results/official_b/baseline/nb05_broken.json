@@ -1,0 +1,35 @@
+{
+  "notebook": "nb05_broken.ipynb",
+  "findings": [
+    {
+      "type": "E2",
+      "cell": 8,
+      "claim": "# analise por segmento",
+      "evidence": "A célula executada mostra: \"ERROR NameError: name 'importancias' is not defined\". O código referencia `importancias` sem definição prévia, logo quebraria em execução limpa.",
+      "severity": "high"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "\"recall de 0.80 no segmento prepaid\"",
+      "evidence": "Nenhuma célula calcula recall por segmento nem existe variável/feature \"prepaid\". A única métrica de recall computada é na célula 9: \"RECALL_TEST=0.119\" (global, threshold 0.5).",
+      "severity": "high"
+    },
+    {
+      "type": "E1",
+      "cell": 11,
+      "claim": "\"recall de 0.80\" (implícito como desempenho do modelo)",
+      "evidence": "Diverge do que foi efetivamente calculado: célula 9 imprime RECALL_TEST=0.119. Gap = 0.681 (> 0.05).",
+      "severity": "high"
+    }
+  ],
+  "scores": {
+    "C1": 4,
+    "C2": 1,
+    "C3": 1,
+    "C4": 2
+  },
+  "weighted_score": 2.1,
+  "decision": "REPROVAR",
+  "summary": "Decisão sugerida: REPROVAR. Metodologia de split/pipeline está correta (sem evidência de leakage), porém o notebook não executa de ponta a ponta (NameError) e a conclusão reporta um recall 0.80 por segmento que não é calculado e contradiz o recall real impresso (0.119). Comunicação final fica desconectada dos números produzidos."
+}

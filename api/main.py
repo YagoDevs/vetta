@@ -8,6 +8,10 @@ Sobe com: .venv/bin/uvicorn api.main:app --port 8000
 Serve tambem o frontend buildado (frontend/dist), se existir.
 """
 import json
+import re
+import subprocess
+import sys
+import threading
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -37,6 +41,13 @@ def _load(path: Path) -> dict:
     return json.loads(path.read_text())
 
 
+_META_FILES = {"status.json", "human_decisions.json", "evaluation.json"}
+
+
+def _verdict_files(d: Path) -> list[Path]:
+    return sorted(f for f in d.glob("*.json") if f.name not in _META_FILES)
+
+
 def _decisions_file(run_id: str) -> Path:
     return _run_dir(run_id) / "human_decisions.json"
 
@@ -50,9 +61,9 @@ def _human_decisions(run_id: str) -> dict:
 def list_runs():
     runs = []
     for d in sorted(RESULTS.iterdir()):
-        if d.is_dir() and any(d.glob("nb*.json")):
+        if d.is_dir() and _verdict_files(d):
             runs.append({"run_id": d.name,
-                         "candidates": len(list(d.glob("nb*.json"))),
+                         "candidates": len(_verdict_files(d)),
                          "has_baseline": (d / "baseline").exists(),
                          "has_evaluation": (d / "evaluation.json").exists()})
     return runs
@@ -63,7 +74,7 @@ def candidates(run_id: str):
     d = _run_dir(run_id)
     human = _human_decisions(run_id)
     out = []
-    for f in sorted(d.glob("nb*.json")):
+    for f in _verdict_files(d):
         v = _load(f)
         out.append({
             "id": f.stem,
@@ -73,6 +84,8 @@ def candidates(run_id: str):
             "summary": v["summary"],
             "critical_findings": [x["type"] for x in v["findings"]
                                   if x["severity"] == "critical"],
+            "findings": [{"type": x["type"], "severity": x["severity"],
+                          "claim": x["claim"][:140]} for x in v["findings"]],
             "n_findings": len(v["findings"]),
             "human_decision": human.get(f.stem),
         })
@@ -88,7 +101,9 @@ def candidate_detail(run_id: str, cand_id: str):
     if not f.exists():
         raise HTTPException(404, "candidato nao encontrado")
     v = _load(f)
-    nb_file = NOTEBOOKS / f"{cand_id}.ipynb"
+    st = d / "status.json"
+    nb_root = Path(_load(st).get("notebooks_path", NOTEBOOKS)) if st.exists() else NOTEBOOKS
+    nb_file = nb_root / f"{cand_id}.ipynb"
     cells = []
     if nb_file.exists():
         nb = _load(nb_file)
@@ -137,6 +152,72 @@ def comparison(run_id: str):
     if not f.exists():
         raise HTTPException(404, "rode evaluate.py primeiro")
     return _load(f)
+
+
+# ---------------------------------------------------------- nova avaliacao
+class NewEvaluation(BaseModel):
+    name: str                 # vira o run_id (slug)
+    notebooks_path: str       # pasta local com os .ipynb
+    mode: str = "live"        # live | replay
+
+
+def _slug(name: str) -> str:
+    return re.sub(r"[^a-z0-9_-]+", "-", name.lower()).strip("-") or "avaliacao"
+
+
+def _status_file(run_id: str) -> Path:
+    return RESULTS / run_id / "status.json"
+
+
+def _pipeline_worker(run_id: str, nb_path: str, mode: str, total: int):
+    st = _status_file(run_id)
+    def write(state, extra=None):
+        st.write_text(json.dumps({"state": state, "total": total, **(extra or {})}))
+    try:
+        write("running")
+        py = sys.executable
+        r = subprocess.run([py, str(ROOT / "vetta.py"), "run", nb_path,
+                            "--mode", mode, "--run-id", run_id],
+                           cwd=ROOT, capture_output=True, text=True, timeout=3600)
+        if r.returncode != 0:
+            write("error", {"error": r.stderr[-800:]})
+            return
+        subprocess.run([py, str(ROOT / "baseline.py"), nb_path,
+                        "--mode", mode, "--run-id", run_id],
+                       cwd=ROOT, capture_output=True, text=True, timeout=1800)
+        write("done")
+    except Exception as e:  # noqa: BLE001 — status precisa refletir qualquer falha
+        write("error", {"error": str(e)[:800]})
+
+
+@app.post("/api/evaluations")
+def create_evaluation(body: NewEvaluation):
+    nb_dir = Path(body.notebooks_path).expanduser()
+    if not nb_dir.is_dir():
+        raise HTTPException(422, f"pasta nao encontrada: {nb_dir}")
+    notebooks = sorted(nb_dir.glob("*.ipynb"))
+    if not notebooks:
+        raise HTTPException(422, "nenhum .ipynb na pasta")
+    run_id = _slug(body.name)
+    if (RESULTS / run_id).exists() and _verdict_files(RESULTS / run_id):
+        raise HTTPException(409, f"avaliacao '{run_id}' ja existe")
+    (RESULTS / run_id).mkdir(parents=True, exist_ok=True)
+    _status_file(run_id).write_text(json.dumps({"state": "starting",
+                                                "total": len(notebooks),
+                                                "notebooks_path": str(nb_dir)}))
+    threading.Thread(target=_pipeline_worker,
+                     args=(run_id, str(nb_dir), body.mode, len(notebooks)),
+                     daemon=True).start()
+    return {"run_id": run_id, "candidates": len(notebooks)}
+
+
+@app.get("/api/runs/{run_id}/status")
+def run_status(run_id: str):
+    d = _run_dir(run_id)
+    st = _status_file(run_id)
+    status = _load(st) if st.exists() else {"state": "done", "total": None}
+    status["completed"] = len(_verdict_files(d))
+    return status
 
 
 dist = ROOT / "frontend" / "dist"

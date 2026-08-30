@@ -1,0 +1,103 @@
+{
+  "notebook": "nb01_strong.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 5
+  },
+  "weighted_score": 5.0,
+  "decision": "AVANCAR",
+  "summary": "Qualidade geral muito boa: o notebook roda de ponta a ponta, é consistente e segue boas práticas para evitar erros de validação. O ponto mais importante é que ele organiza o preparo dos dados e o treinamento de forma correta (separa treino e teste antes e aplica as transformações só com dados de treino), o que reduz risco de “resultado inflado”. Os resultados reportados batem com o que é gerado na execução (AUC 0,729) e as conclusões estão apoiadas em evidências, incluindo limitações. Na entrevista, verifique se a pessoa sabe explicar as escolhas do modelo e métricas (especialmente o impacto do recall baixo), e como faria a validação temporal/backtesting e eventual ajuste de limiar para atender objetivos do negócio.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.41\nc__contract_type_monthly    0.41\nn__tenure_months           -0.39\nn__n_support_calls          0.33\nn__n_complaints             0.32\nn__total_charges           -0.27\nn__monthly_charges          0.25\nn__late_payment             0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": []
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 5,
+        "C3": 5,
+        "C4": 5
+      },
+      "justifications": {
+        "C1": "Na célula 7 o split é estratificado e ocorre antes de qualquer transformação; o pré-processamento (StandardScaler/OneHot) está dentro de um Pipeline e é aprendido apenas em X_tr, evitando vazamento. A sujeira citada é tratada explicitamente na célula 3 (vírgula decimal, datas mistas, normalização de categoria e imputações).",
+        "C2": "O notebook executa de ponta a ponta sem erros e com resultados estáveis: o train_test_split e o LogisticRegression usam random_state=42 (célula 7). As saídas principais (métricas e coeficientes) são geradas diretamente pelas células 8 e 9 sem depender de execução fora de ordem.",
+        "C3": "O texto declara AUC 0.729 e isso confere com a métrica produzida na célula 8 (AUC_TEST=0.729; tolerância exata). Também não há outras métricas “prometidas” no texto que não apareçam no output executado.",
+        "C4": "As conclusões estão ancoradas em evidências: usa AUC do teste (célula 8) e aponta drivers coerentes com os maiores coeficientes (célula 9), além de recomendar uma ação segmentada (contrato mensal + reclamação). Reconhece limitação relevante (recall baixo em 0.5, célula 8) e propõe próximo passo adequado (validação temporal/backtesting)."
+      }
+    }
+  ]
+}

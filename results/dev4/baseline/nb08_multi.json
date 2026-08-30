@@ -1,0 +1,28 @@
+{
+  "notebook": "nb08_multi.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "\"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+      "evidence": "Na célula 7 o candidato aplica `df[num] = StandardScaler().fit_transform(df[num])` ANTES do `train_test_split(...)`. Isso ajusta o scaler no dataset inteiro (inclui teste), caracterizando leakage.",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "\"Excelente resultado: AUC de 0.97 e precision de 0.91 nos clientes fiber\"",
+      "evidence": "A célula 8 computa e imprime apenas `AUC_TEST=0.729`, `RECALL_TEST=0.119`, `ACC_TEST=0.853`. Não há nenhuma célula computando AUC=0.97 nem precision (nem segmentada por \"fiber\").",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 4,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.6,
+  "decision": "REPROVAR",
+  "summary": "Decisão sugerida: REPROVAR. Há vazamento de dados por padronização antes do split (S1), e a conclusão cita métricas (AUC=0.97; precision=0.91 em fiber) que não são produzidas por nenhuma célula e contradizem o AUC_test reportado (E4), comprometendo a integridade e a comunicação dos resultados."
+}

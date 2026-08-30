@@ -1,0 +1,119 @@
+{
+  "notebook": "nb02_honest.ipynb",
+  "findings": [
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "“Pelos coeficientes acima, contrato mensal, reclamações e atraso de pagamento são os principais sinais de churn.”",
+      "evidence": "A célula 9 imprime os 8 maiores coeficientes em valor absoluto e inclui contract_type_monthly (0.44), n_complaints (0.32) e late_payment (0.25), mas também inclui variáveis com |coef| maior do que late_payment e n_complaints (ex.: c__contract_type_annual = -0.45, n__tenure_months = -0.39, n__n_support_calls = 0.37). Ou seja, ‘os principais’ não corresponde ao ranking efetivamente mostrado.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 2
+  },
+  "weighted_score": 4.4,
+  "decision": "REVISAR",
+  "summary": "A qualidade geral do notebook é boa: está organizado, roda do começo ao fim e usa boas práticas como separar treino e teste antes do treinamento e avaliar com AUC. O ponto mais importante é uma inconsistência entre a conclusão e os resultados: a narrativa diz quais seriam os “principais sinais” de churn, mas o ranking de coeficientes mostrado inclui outras variáveis tão ou mais relevantes, então a interpretação fica pouco sustentada. Na entrevista, vale verificar como a pessoa tiraria conclusões a partir dos coeficientes (incluindo sinal e magnitude), como validaria a explicação do modelo e como ajustaria a comunicação quando os números não confirmam a história.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        },
+        "b": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "shape apos limpeza: (6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.714\nRECALL_TEST=0.089\nACC_TEST=0.845\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.45\nc__contract_type_monthly    0.44\nn__tenure_months           -0.39\nn__n_support_calls          0.37\nn__n_complaints             0.32\nn__total_charges           -0.30\nn__late_payment             0.25\nn__monthly_charges          0.23\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "E4",
+          "cell": 10,
+          "claim": "“Pelos coeficientes acima, contrato mensal, reclamações e atraso de pagamento são os principais sinais de churn.”",
+          "evidence": "A célula 9 imprime os 8 maiores coeficientes em valor absoluto e inclui contract_type_monthly (0.44), n_complaints (0.32) e late_payment (0.25), mas também inclui variáveis com |coef| maior do que late_payment e n_complaints (ex.: c__contract_type_annual = -0.45, n__tenure_months = -0.39, n__n_support_calls = 0.37). Ou seja, ‘os principais’ não corresponde ao ranking efetivamente mostrado.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 5,
+        "C3": 5,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "Na célula 7 o split (train_test_split) ocorre antes do fit e o pré-processamento está dentro de Pipeline/ColumnTransformer, evitando vazamento; na célula 8 usa AUC (adequada para desbalanceamento) e discute limitação de recall na célula 10.",
+        "C2": "O notebook executa ponta a ponta sem erros nas células 1–9 e fixa random_state no split e no modelo (célula 7), indicando resultados estáveis.",
+        "C3": "A métrica declarada na narrativa (“AUC 0.714” na célula 10) confere com o output executado (AUC_TEST=0.714 na célula 8), sem divergências numéricas reportadas.",
+        "C4": "Há finding E4: a conclusão na célula 10 afirma que ‘contrato mensal, reclamações e atraso de pagamento são os principais sinais’, mas a célula 9 mostra variáveis com |coef| maior (ex.: contract_type_annual, tenure_months, n_support_calls), enfraquecendo a sustentação da narrativa."
+      }
+    }
+  ]
+}

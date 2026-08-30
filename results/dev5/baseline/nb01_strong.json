@@ -1,0 +1,21 @@
+{
+  "notebook": "nb01_strong.ipynb",
+  "findings": [
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "A narrativa menciona apenas AUC e recomenda ação; o notebook também reporta ACC_TEST=0.853 num problema com churn rate 0.157, o que pode soar “bom” apesar do recall muito baixo.",
+      "evidence": "Saída da célula 5: churn rate=0.157 (base desbalanceada). Saída da célula 8: ACC_TEST=0.853 e RECALL_TEST=0.119. Não há discussão explícita no texto sobre por que accuracy é inadequada aqui (apesar de mencionar o recall baixo).",
+      "severity": "medium"
+    }
+  ],
+  "scores": {
+    "C1": 4,
+    "C2": 5,
+    "C3": 5,
+    "C4": 4
+  },
+  "weighted_score": 4.5,
+  "decision": "AVANCAR",
+  "summary": "Score ponderado=4.50. Decisão sugerida: AVANÇAR. Metodologia de split/pipeline está correta e evita leakage; execução é reprodutível (random_state fixado). Métricas e conclusão batem com outputs (AUC 0.729). Ponto de atenção: reporta accuracy em base desbalanceada sem contextualizar; porém a conclusão se ancora em AUC e reconhece recall baixo e necessidade de calibrar threshold."
+}

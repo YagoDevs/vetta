@@ -1,0 +1,13 @@
+{
+  "notebook": "nb01_strong.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 5
+  },
+  "weighted_score": 5.0,
+  "decision": "AVANCAR",
+  "summary": "Nenhum defeito S1-S4/E1-E4 encontrado com evidência concreta no notebook fornecido. O split é estratificado e ocorre antes do fit do pré-processamento (Pipeline/ColumnTransformer), evitando leakage. Métricas reportadas (AUC=0.729, recall=0.119, acc=0.853) batem com os outputs e o texto reconhece o baixo recall e sugere calibração de threshold, além de apontar ausência de validação temporal como limitação. Código parece reprodutível (random_state fixado no split e no LogisticRegression) e executa de ponta a ponta conforme outputs."
+}

@@ -1,0 +1,13 @@
+{
+  "notebook": "nb01_strong.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 5
+  },
+  "weighted_score": 5.0,
+  "decision": "AVANCAR",
+  "summary": "Sem defeitos S1–S4/E1–E4 com evidência no notebook. Metodologia correta: split estratificado antes de qualquer fit/transform e preprocessamento dentro de Pipeline/ColumnTransformer. Métrica principal (AUC) é apropriada para desbalanceamento e o texto reconhece recall baixo no threshold 0.5. Execução estável (random_state fixado) e sem células que aparentem quebrar. Números citados (AUC 0.729) batem com o output, e as conclusões estão suportadas pelos coeficientes exibidos e pelas métricas."
+}

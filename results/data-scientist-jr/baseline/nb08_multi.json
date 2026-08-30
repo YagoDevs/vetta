@@ -1,0 +1,28 @@
+{
+  "notebook": "nb08_multi.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "No markdown anterior (cell 6) o candidato afirma: \"Split estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino.\"",
+      "evidence": "Na cell 7 há fit do StandardScaler no dataset inteiro antes do split: `df[num] = StandardScaler().fit_transform(df[num])` e só depois ocorre `train_test_split(...)`. Isso vaza informação do teste para o treino.",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "Conclusão: \"AUC de 0.97\" e \"precision de 0.91 nos clientes fiber\".",
+      "evidence": "A única AUC computada no notebook é `AUC_TEST=0.729` (cell 8). Não existe nenhuma célula que compute precision (nem geral, nem filtrada para `internet_tech == 'fiber'`).",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "REPROVAR. Vazamento de dados por normalização (StandardScaler) ajustada no dataset inteiro antes do split (S1), contrariando a própria narrativa. Além disso, a conclusão cita métricas (AUC=0.97 e precision=0.91 em fiber) que não são produzidas por nenhuma célula; a AUC calculada é 0.729 (E4), comprometendo a integridade e tornando a recomendação de deploy injustificada."
+}

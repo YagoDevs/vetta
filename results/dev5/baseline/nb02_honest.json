@@ -1,0 +1,21 @@
+{
+  "notebook": "nb02_honest.ipynb",
+  "findings": [
+    {
+      "type": "E3",
+      "cell": 7,
+      "claim": "\"Split estratificado ANTES de qualquer transformação\"",
+      "evidence": "O split usa train_test_split(X, y, test_size=0.25, random_state=42) sem o parâmetro stratify=y. Logo não é estratificado (apesar de ter random_state).",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 4,
+    "C2": 5,
+    "C3": 4,
+    "C4": 4
+  },
+  "weighted_score": 4.2,
+  "decision": "REVISAR",
+  "summary": "Não há evidência de leakage (Pipeline com preprocess fitado só no treino) nem de métrica enganosa: AUC é reportado e o texto reconhece recall baixo. O principal problema é de integridade: o notebook afirma split estratificado, mas o código não estratifica. Demais números citados (AUC 0.714) batem com o output e as conclusões são suportadas pelos coeficientes e métricas. Score ponderado = 0.30*4 + 0.20*5 + 0.30*4 + 0.20*4 = 4.2. Decisão sugerida: AVANÇAR."
+}

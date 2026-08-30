@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.2-2025-12-11",
+  "tag": "report_nb03_inflated.ipynb",
+  "system": "Voce redige o resumo executivo de uma avaliacao tecnica para uma recrutadora\n(conhecimento tecnico medio). 3-5 frases, portugues claro, sem jargao gratuito.\nDiga: qualidade geral, o achado mais importante (se houver) em termos que ela entenda,\ne o que verificar na entrevista. Tom factual — nem vendedor, nem alarmista.\nResponda APENAS JSON: {\"summary\": \"...\"}",
+  "user": "{\"notebook\": \"nb03_inflated.ipynb\", \"decisao\": \"REPROVAR\", \"scores\": {\"C1\": 5, \"C2\": 5, \"C3\": 1, \"C4\": 5}, \"justificativas\": {\"C1\": \"A célula 7 faz split estratificado antes de qualquer fit e usa Pipeline+ColumnTransformer para aprender scaler/one-hot apenas no treino, alinhado ao texto da célula 6; além disso a limpeza trata vírgula decimal, datas mistas e categorias inconsistentes na célula 3.\", \"C2\": \"O notebook executa de ponta a ponta sem exceções (células 1, 3, 7–9) e fixa random_state no split e no LogisticRegression (célula 7), sugerindo estabilidade de execução.\", \"C3\": \"Há divergência crítica entre o que é declarado e o que é produzido: a célula 10 afirma AUC 0.93, mas a célula 8 imprime AUC_TEST=0.729 (finding E1 critical), diferença > 0.05.\", \"C4\": \"As conclusões estão conectadas a números gerados (AUC/recall/acc na célula 8 e coeficientes na célula 9) e respondem ao objetivo de prever churn; não há finding S3/E4 que rebaixe a narrativa, então não há penalização aqui pela rubrica.\"}, \"findings\": [{\"type\": \"E1\", \"cell\": 10, \"claim\": \"\\\"O modelo atinge **AUC 0.93** no teste\\\"\", \"evidence\": \"A célula 8 imprime \\\"AUC_TEST=0.729\\\" (run_a=0.729, run_b=0.729). Diferença absoluta vs 0.93 = 0.201 (> 0.05).\", \"severity\": \"critical\"}]}",
+  "response": {
+    "summary": "Qualidade geral: boa organização e execução estável, com preparo de dados e validação feitos de forma correta (sem “vazar” informação do teste para o treino). O achado mais importante é uma inconsistência crítica: o texto final afirma AUC 0,93, mas o resultado realmente impresso no teste é AUC 0,729, o que indica erro de reporte ou interpretação dos resultados. Isso compromete a confiabilidade da conclusão e justifica a reprovação, apesar do restante estar bem estruturado. Na entrevista, verificar como a pessoa calcula e reporta métricas (AUC/recall), como garante que números no texto correspondem às saídas do código, e pedir que ela explique de onde veio o 0,93 e como validaria o desempenho em dados novos."
+  },
+  "usage": {
+    "prompt": 512,
+    "completion": 174
+  }
+}

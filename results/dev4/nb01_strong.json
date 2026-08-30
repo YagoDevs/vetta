@@ -1,0 +1,119 @@
+{
+  "notebook": "nb01_strong.ipynb",
+  "findings": [
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "Conclusão destaca sinais (coeficientes) como se fossem evidência direta de importância/causalidade: “Pelos coeficientes acima, contrato mensal, reclamações e atraso de pagamento são os principais sinais de churn.”",
+      "evidence": "O modelo é uma regressão logística com OneHotEncoder/StandardScaler e regularização padrão; os coeficientes (cell 9) são apresentados, mas não há checagem de significância, intervalos de confiança, estabilidade (CV/bootstrapping) ou análise de efeitos marginais. Além disso, coeficientes em escala padronizada e com correlação entre variáveis podem distorcer a leitura de “principais sinais”. A evidência mostrada é apenas o ranking por |coef| impresso na cell 9.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 2
+  },
+  "weighted_score": 4.4,
+  "decision": "REVISAR",
+  "summary": "Qualidade geral boa: o notebook roda de ponta a ponta, é reprodutível e organiza bem o preparo dos dados e o treino sem “vazamento” entre treino e teste. O achado mais importante é na conclusão: ela afirma quais seriam os “principais sinais de churn” com base apenas no ranking de coeficientes do modelo, sem demonstrar se esses sinais são estáveis ou realmente interpretáveis (pode variar com o conjunto de dados e com correlações entre variáveis). Na entrevista, peça para o(a) candidato(a) explicar como validaria essa interpretação (ex.: validação cruzada/estabilidade, intervalos de confiança, análise de impacto) e como comunicaria limitações ao negócio. Também vale checar se ele(a) entende o trade-off visto nos resultados (AUC ok, mas recall baixo) e como ajustaria o limiar ou métricas para o objetivo do time.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.41\nc__contract_type_monthly    0.41\nn__tenure_months           -0.39\nn__n_support_calls          0.33\nn__n_complaints             0.32\nn__total_charges           -0.27\nn__monthly_charges          0.25\nn__late_payment             0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S3",
+          "cell": 10,
+          "claim": "Conclusão destaca sinais (coeficientes) como se fossem evidência direta de importância/causalidade: “Pelos coeficientes acima, contrato mensal, reclamações e atraso de pagamento são os principais sinais de churn.”",
+          "evidence": "O modelo é uma regressão logística com OneHotEncoder/StandardScaler e regularização padrão; os coeficientes (cell 9) são apresentados, mas não há checagem de significância, intervalos de confiança, estabilidade (CV/bootstrapping) ou análise de efeitos marginais. Além disso, coeficientes em escala padronizada e com correlação entre variáveis podem distorcer a leitura de “principais sinais”. A evidência mostrada é apenas o ranking por |coef| impresso na cell 9.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 5,
+        "C3": 5,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "A cell 7 faz split estratificado antes de qualquer transformação e encapsula o pré-processamento em Pipeline/ColumnTransformer (StandardScaler/OneHotEncoder aprendem só no treino), evitando vazamento; a sujeira citada é tratada explicitamente na cell 3 (vírgula decimal, datas mistas, categorias, imputações).",
+        "C2": "O notebook executa ponta a ponta sem erros/warnings reportados (cells 1, 3, 7–9) e fixa random_state no train_test_split e no LogisticRegression (cell 7), garantindo reprodutibilidade dos números mostrados.",
+        "C3": "O texto declara AUC 0.729 (cell 10) e o output executado mostra AUC_TEST=0.729 (cell 8), sem divergências relevantes; demais números exibidos no código (recall/acc na cell 8) também batem com o que é produzido.",
+        "C4": "Há finding S3: a conclusão infere “principais sinais de churn” a partir do ranking de coeficientes (cell 10) sem evidência adicional de estabilidade/interpretabilidade (apenas |coef| na cell 9), o que enfraquece a narrativa; apesar disso, recomendações e limitações (threshold/validação temporal) estão alinhadas aos outputs (AUC na cell 8 e recall baixo)."
+      }
+    }
+  ]
+}

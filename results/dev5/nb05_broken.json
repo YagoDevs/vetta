@@ -1,0 +1,182 @@
+{
+  "notebook": "nb05_broken.ipynb",
+  "findings": [
+    {
+      "type": "E2",
+      "cell": 8,
+      "claim": "Notebook executa limpo até o fim (há uma célula de análise por segmento).",
+      "evidence": "Em execução limpa, a célula 8 falha com: \"NameError: name 'importancias' is not defined\". Além disso, fatos_de_execucao.executed_ok=false e error_cells aponta a célula 8.",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "\"recall de 0.80 no segmento prepaid\"",
+      "evidence": "Nenhuma célula computa recall por segmento/\"prepaid\". A única métrica de recall impressa é global no teste (célula 9): RECALL_TEST=0.119. Não há filtro/agrupamento por segmento nem cálculo de recall segmentado.",
+      "severity": "major"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "\"As importâncias de variáveis confirmam tenure e reclamações como principais fatores.\"",
+      "evidence": "Não há cálculo de \"importâncias\" (a variável importancias nem existe e a célula 8 quebra). A célula 10 imprime coeficientes do LogisticRegression; apesar de mostrar tenure_months e n_complaints/n_support_calls entre os maiores em valor absoluto, o notebook não computa/importa \"importâncias\" como declarado.",
+      "severity": "major"
+    },
+    {
+      "type": "E1",
+      "cell": 11,
+      "claim": "\"recall de 0.80\" (no contexto do modelo apresentado)",
+      "evidence": "A métrica real executada no teste (célula 9) é RECALL_TEST=0.119. Divergência absoluta = 0.681 (> 0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 11,
+      "claim": "\"O modelo tem bom desempenho\" (sem qualificação) em um problema com churn rate baixo.",
+      "evidence": "EDA (célula 5) mostra churn rate=0.157 (base desbalanceada). Mesmo assim, a narrativa sugere bom desempenho enquanto o recall real no teste é muito baixo (RECALL_TEST=0.119), e a acurácia alta (ACC_TEST=0.853) pode ser enganosa nesse cenário. A conclusão não se ancora em AUC ou em métricas orientadas a churn (ex.: recall/PR-AUC) para sustentar \"bom desempenho\".",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 1,
+    "C3": 1,
+    "C4": 2
+  },
+  "weighted_score": 2.4,
+  "decision": "REPROVAR",
+  "summary": "Qualidade geral: abaixo do esperado; apesar de boa estrutura de preparação dos dados e cuidado para evitar vazamento, o trabalho não é confiável como entrega final. O achado mais importante é uma falha crítica de execução: o notebook não roda até o fim (erro de variável não definida), o que impede reproduzir os resultados. Além disso, há inconsistência relevante entre o que é afirmado no texto (ex.: “recall 0,80”) e o que de fato foi calculado (recall bem baixo), e não existe a análise por segmento citada. Na entrevista, verifique se a pessoa consegue explicar por que o notebook quebrou, corrigir rapidamente, e justificar as métricas escolhidas para um problema desbalanceado, conectando conclusões diretamente aos números produzidos.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": false,
+      "error_cells": [
+        8
+      ],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": false,
+        "error_cells": [
+          {
+            "cell": 8,
+            "error": "NameError: name 'importancias' is not defined"
+          }
+        ],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 10,
+            "outputs": [
+              "c__contract_type_annual    -0.41\nc__contract_type_monthly    0.41\nn__tenure_months           -0.39\nn__n_support_calls          0.33\nn__n_complaints             0.32\nn__total_charges           -0.27\nn__monthly_charges          0.25\nn__late_payment             0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "E2",
+          "cell": 8,
+          "claim": "Notebook executa limpo até o fim (há uma célula de análise por segmento).",
+          "evidence": "Em execução limpa, a célula 8 falha com: \"NameError: name 'importancias' is not defined\". Além disso, fatos_de_execucao.executed_ok=false e error_cells aponta a célula 8.",
+          "severity": "critical"
+        },
+        {
+          "type": "E4",
+          "cell": 11,
+          "claim": "\"recall de 0.80 no segmento prepaid\"",
+          "evidence": "Nenhuma célula computa recall por segmento/\"prepaid\". A única métrica de recall impressa é global no teste (célula 9): RECALL_TEST=0.119. Não há filtro/agrupamento por segmento nem cálculo de recall segmentado.",
+          "severity": "major"
+        },
+        {
+          "type": "E4",
+          "cell": 11,
+          "claim": "\"As importâncias de variáveis confirmam tenure e reclamações como principais fatores.\"",
+          "evidence": "Não há cálculo de \"importâncias\" (a variável importancias nem existe e a célula 8 quebra). A célula 10 imprime coeficientes do LogisticRegression; apesar de mostrar tenure_months e n_complaints/n_support_calls entre os maiores em valor absoluto, o notebook não computa/importa \"importâncias\" como declarado.",
+          "severity": "major"
+        },
+        {
+          "type": "E1",
+          "cell": 11,
+          "claim": "\"recall de 0.80\" (no contexto do modelo apresentado)",
+          "evidence": "A métrica real executada no teste (célula 9) é RECALL_TEST=0.119. Divergência absoluta = 0.681 (> 0.05).",
+          "severity": "critical"
+        },
+        {
+          "type": "S3",
+          "cell": 11,
+          "claim": "\"O modelo tem bom desempenho\" (sem qualificação) em um problema com churn rate baixo.",
+          "evidence": "EDA (célula 5) mostra churn rate=0.157 (base desbalanceada). Mesmo assim, a narrativa sugere bom desempenho enquanto o recall real no teste é muito baixo (RECALL_TEST=0.119), e a acurácia alta (ACC_TEST=0.853) pode ser enganosa nesse cenário. A conclusão não se ancora em AUC ou em métricas orientadas a churn (ex.: recall/PR-AUC) para sustentar \"bom desempenho\".",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 1,
+        "C3": 1,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "A célula 7 faz split estratificado antes de qualquer fit/transform e usa Pipeline+ColumnTransformer, evitando vazamento; além disso, a limpeza trata vírgula decimal, datas mistas e categorias (célula 3) e reporta churn rate desbalanceado (célula 5).",
+        "C2": "Há falha de execução crítica: a célula 8 lança NameError porque 'importancias' não foi definida, impedindo o notebook de rodar de ponta a ponta (finding E2 critical).",
+        "C3": "O texto declara “recall de 0.80 no segmento prepaid” (célula 11), mas o recall efetivamente calculado/imprimido é RECALL_TEST=0.119 (célula 9), divergência >0.05 (finding E1 critical).",
+        "C4": "A conclusão afirma “bom desempenho” e se apoia em recall segmentado e “importâncias”, mas não há cálculo por segmento/prepaid e a célula 8 quebra; além disso, com churn rate=0.157 (célula 5) e recall=0.119 (célula 9), a narrativa não está amarrada aos números (findings E4 e S3)."
+      }
+    }
+  ]
+}

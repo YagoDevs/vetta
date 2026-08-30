@@ -1,0 +1,35 @@
+{
+  "notebook": "nb06_target.ipynb",
+  "findings": [
+    {
+      "type": "S2",
+      "cell": 6,
+      "claim": "Feature de risco composta",
+      "evidence": "Na célula 6: df['risk_score'] = df['churned'] * df['n_complaints'] + df['late_payment'] usa diretamente o target (churned) para construir uma feature, causando vazamento e inflando desempenho.",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 11,
+      "claim": "\"Com a nova feature de risco, o modelo chega a AUC 0.99\"",
+      "evidence": "Na célula 9 o notebook computa AUC_TEST=0.858, não 0.99 (diferença 0.132 > 0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "\"AUC 0.99\" citado na conclusão",
+      "evidence": "Nenhuma célula computa 0.99; a única AUC exibida é 0.858 na célula 9.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "REPROVAR. Há vazamento crítico por feature construída a partir do target (S2), invalidando a metodologia. Além disso, a conclusão cita AUC 0.99, mas o notebook mostra AUC_TEST=0.858 (E1) e não há nenhuma célula que produza 0.99 (E4). Código executa com seed fixada e sem quebras aparentes, porém resultados e conclusões não são íntegros."
+}

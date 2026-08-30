@@ -1,0 +1,147 @@
+{
+  "notebook": "nb07_unstable.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 2,
+      "claim": "\"O CSV tem decimais com vírgula, datas em dois formatos e categorias inconsistentes — tratamos tudo explicitamente.\"",
+      "evidence": "Na limpeza (célula 3) a data é parseada com format='%Y-%m-%d' e errors='coerce', então qualquer data no \"outro formato\" vira NaT. Em seguida há df.dropna(subset=['reference_date','total_charges']) sem reportar quantas linhas foram descartadas (apenas print('ok')). Isso caracteriza potencial perda silenciosa de dados, especialmente dado que o markdown afirma existir datas em dois formatos.",
+      "severity": "major"
+    },
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "\"Modelo com AUC 0.738 no teste.\"",
+      "evidence": "Métrica executada (célula 8) imprime AUC_TEST=0.728 na run_a e 0.709 na run_b. A alegação 0.738 diverge da execução; tomando run_a como referência, |0.738-0.728|=0.010 (não seria E1), mas nenhuma célula computa 0.738 e as execuções fornecidas não batem com o valor declarado. Como a conclusão cita um número específico diferente dos resultados observados, trata-se de divergência entre texto e execução conforme os fatos fornecidos.",
+      "severity": "critical"
+    },
+    {
+      "type": "E3",
+      "cell": 7,
+      "claim": "Resultados do modelo são reprodutíveis/estáveis (implícito ao reportar um AUC único sem mencionar aleatoriedade).",
+      "evidence": "train_test_split é chamado sem random_state (célula 7). As métricas variam entre runs: AUC_TEST 0.728 vs 0.709 (Δ=0.019), RECALL_TEST 0.090 vs 0.065 (Δ=0.025 > 0.02). Isso indica dependência de seed não fixada com variação material.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 2,
+    "C2": 2,
+    "C3": 1,
+    "C4": 5
+  },
+  "weighted_score": 2.3,
+  "decision": "REPROVAR",
+  "summary": "Qualidade geral abaixo do esperado para aprovação: há partes bem estruturadas (pipeline e análise de variáveis), mas o notebook não é confiável como está. O achado mais importante é uma divergência crítica entre o que o texto conclui e o que foi realmente calculado (AUC reportado não aparece em nenhuma execução), além de resultados variarem entre rodadas por falta de fixação de aleatoriedade. Também há risco de perda silenciosa de dados ao tentar converter datas (força um único formato) e depois remover linhas inválidas sem informar quantas foram descartadas. Na entrevista, verifique se a pessoa consegue explicar como garantir reprodutibilidade (random_state/validação), como auditar impacto de limpezas (contagem de linhas removidas e tratamento de múltiplos formatos) e como alinhar conclusões ao output real do código.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.728,
+          "RECALL_TEST": 0.09,
+          "ACC_TEST": 0.848
+        },
+        "b": {
+          "AUC_TEST": 0.709,
+          "RECALL_TEST": 0.065,
+          "ACC_TEST": 0.846
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.728,
+          "RECALL_TEST": 0.09,
+          "ACC_TEST": 0.848
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.709,
+          "RECALL_TEST": 0.065,
+          "ACC_TEST": 0.846
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "ok\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.153\ncontract_type\nannual     0.098\nmonthly    0.191\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.728\nRECALL_TEST=0.090\nACC_TEST=0.848\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "n__tenure_months           -0.39\nc__contract_type_monthly    0.38\nc__contract_type_annual    -0.38\nn__n_support_calls          0.38\nn__n_complaints             0.33\nn__monthly_charges          0.24\nn__total_charges           -0.23\nn__late_payment             0.19\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S4",
+          "cell": 2,
+          "claim": "\"O CSV tem decimais com vírgula, datas em dois formatos e categorias inconsistentes — tratamos tudo explicitamente.\"",
+          "evidence": "Na limpeza (célula 3) a data é parseada com format='%Y-%m-%d' e errors='coerce', então qualquer data no \"outro formato\" vira NaT. Em seguida há df.dropna(subset=['reference_date','total_charges']) sem reportar quantas linhas foram descartadas (apenas print('ok')). Isso caracteriza potencial perda silenciosa de dados, especialmente dado que o markdown afirma existir datas em dois formatos.",
+          "severity": "major"
+        },
+        {
+          "type": "E1",
+          "cell": 10,
+          "claim": "\"Modelo com AUC 0.738 no teste.\"",
+          "evidence": "Métrica executada (célula 8) imprime AUC_TEST=0.728 na run_a e 0.709 na run_b. A alegação 0.738 diverge da execução; tomando run_a como referência, |0.738-0.728|=0.010 (não seria E1), mas nenhuma célula computa 0.738 e as execuções fornecidas não batem com o valor declarado. Como a conclusão cita um número específico diferente dos resultados observados, trata-se de divergência entre texto e execução conforme os fatos fornecidos.",
+          "severity": "critical"
+        },
+        {
+          "type": "E3",
+          "cell": 7,
+          "claim": "Resultados do modelo são reprodutíveis/estáveis (implícito ao reportar um AUC único sem mencionar aleatoriedade).",
+          "evidence": "train_test_split é chamado sem random_state (célula 7). As métricas variam entre runs: AUC_TEST 0.728 vs 0.709 (Δ=0.019), RECALL_TEST 0.090 vs 0.065 (Δ=0.025 > 0.02). Isso indica dependência de seed não fixada com variação material.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 2,
+        "C2": 2,
+        "C3": 1,
+        "C4": 5
+      },
+      "justifications": {
+        "C1": "Embora o split e o pré-processamento estejam corretamente em pipeline após o train_test_split (célula 7), há problema de metodologia na limpeza: o markdown afirma “datas em dois formatos”, mas o parse força apenas %Y-%m-%d e depois descarta silenciosamente linhas com NaT via dropna sem quantificar impacto (células 2–3), caracterizando S4.",
+        "C2": "Há instabilidade por ausência de random_state no train_test_split (célula 7), com variação reportada entre execuções (AUC 0.728 vs 0.709 e recall 0.090 vs 0.065), o que limita a reprodutibilidade (finding E3).",
+        "C3": "A conclusão declara AUC 0.738 (célula 10), mas a execução mostra AUC_TEST=0.728 (célula 8) e nenhuma célula produz 0.738; há divergência crítica entre texto e resultado (finding E1 critical).",
+        "C4": "As conclusões sobre drivers (contrato mensal, reclamações, tenure) são suportadas pelos coeficientes impressos (célula 9) e o desempenho é contextualizado com métricas no teste (célula 8), sem contradições com os outputs além do número específico do AUC (tratado em C3)."
+      }
+    }
+  ]
+}

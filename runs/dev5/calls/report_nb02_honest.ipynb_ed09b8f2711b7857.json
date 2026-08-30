@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.2-2025-12-11",
+  "tag": "report_nb02_honest.ipynb",
+  "system": "Voce redige o resumo executivo de uma avaliacao tecnica para uma recrutadora\n(conhecimento tecnico medio). 3-5 frases, portugues claro, sem jargao gratuito.\nDiga: qualidade geral, o achado mais importante (se houver) em termos que ela entenda,\ne o que verificar na entrevista. Tom factual — nem vendedor, nem alarmista.\nResponda APENAS JSON: {\"summary\": \"...\"}",
+  "user": "{\"notebook\": \"nb02_honest.ipynb\", \"decisao\": \"AVANCAR\", \"scores\": {\"C1\": 3, \"C2\": 5, \"C3\": 5, \"C4\": 4}, \"justificativas\": {\"C1\": \"A célula 7 usa Pipeline+ColumnTransformer e faz o split antes do fit (células 6–7), evitando vazamento; porém o split não está estratificado apesar do texto afirmar “Split estratificado” (célula 6 vs. train_test_split na célula 7). As métricas incluem AUC (adequada para desbalanceamento) mas também reporta accuracy sem discussão explícita do risco (célula 8).\", \"C2\": \"O notebook executa de ponta a ponta sem erros e com saídas estáveis (células 1, 3, 5, 7–9). Há random_state definido no split e no modelo (célula 7), favorecendo reprodutibilidade.\", \"C3\": \"Os números citados no texto batem com os outputs: a conclusão menciona AUC 0.714 (célula 10) e o código produz AUC_TEST=0.714 (célula 8). Também há coerência entre a interpretação e os maiores coeficientes exibidos (célula 9).\", \"C4\": \"As recomendações são conectadas aos achados (AUC e coeficientes) e há limitação relevante reconhecida (recall baixo e necessidade de calibrar threshold; célula 10). Falta amarrar a recomendação a um trade-off quantitativo (ex.: escolher threshold para elevar recall/precisão) usando os próprios números do teste (célula 8), então a comunicação fica um pouco genérica na parte acionável.\"}, \"findings\": []}",
+  "response": {
+    "summary": "Qualidade geral boa: o notebook roda de ponta a ponta, é reprodutível (uso de semente) e os resultados descritos no texto batem com as saídas. O achado mais importante é um detalhe de validação: o texto diz que o split é estratificado, mas no código o split não parece estratificado, o que pode afetar a comparação justa dos resultados em dados desbalanceados. Na entrevista, vale checar se a pessoa entende quando e por que usar estratificação e como escolher métricas apropriadas (ex.: AUC vs. accuracy) em cenários desbalanceados. Também verifique se ela sabe transformar a recomendação de “ajustar o limiar” em uma decisão prática baseada em números (trade-off entre recall e precisão no conjunto de teste)."
+  },
+  "usage": {
+    "prompt": 503,
+    "completion": 177
+  }
+}

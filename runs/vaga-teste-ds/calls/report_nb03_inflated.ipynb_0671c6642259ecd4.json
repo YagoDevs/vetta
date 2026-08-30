@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.2-2025-12-11",
+  "tag": "report_nb03_inflated.ipynb",
+  "system": "Voce redige o resumo executivo de uma avaliacao tecnica para uma recrutadora\n(conhecimento tecnico medio). 3-5 frases, portugues claro, sem jargao gratuito.\nDiga: qualidade geral, o achado mais importante (se houver) em termos que ela entenda,\ne o que verificar na entrevista. Tom factual — nem vendedor, nem alarmista.\nResponda APENAS JSON: {\"summary\": \"...\"}",
+  "user": "{\"notebook\": \"nb03_inflated.ipynb\", \"decisao\": \"REPROVAR\", \"scores\": {\"C1\": 5, \"C2\": 5, \"C3\": 1, \"C4\": 5}, \"justificativas\": {\"C1\": \"A célula 7 faz split estratificado antes de qualquer transformação e usa Pipeline/ColumnTransformer para garantir que scaler/one-hot aprendem só no treino; a limpeza de decimais/datas/categorias está explícita na célula 3 e a métrica principal (AUC) é adequada ao desbalanceamento mostrado na célula 5 (churn rate 0.157).\", \"C2\": \"O notebook executa de ponta a ponta sem erros e com resultados mostrados em outputs (células 1, 3, 5, 8, 9); há controle de aleatoriedade no split e no classificador (célula 7, random_state=42).\", \"C3\": \"Há divergência crítica entre o texto e o output: a conclusão na célula 10 afirma AUC 0.93, mas a célula 8 imprime AUC_TEST=0.729 (diferença 0.201 > 0.05), conforme o finding E1 critical.\", \"C4\": \"As conclusões e recomendações estão apoiadas pelo resultado de AUC no teste apresentado na célula 8 (AUC_TEST=0.729) e pelos drivers do modelo na célula 9; não há achado S3/E4 para rebaixar narrativa neste critério.\"}, \"findings\": [{\"type\": \"E1\", \"cell\": 10, \"claim\": \"\\\"O modelo atinge **AUC 0.93** no teste\\\"\", \"evidence\": \"A célula 8 imprime AUC_TEST=0.729 (runs a e b iguais). Diferença absoluta = |0.93 - 0.729| = 0.201 > 0.05.\", \"severity\": \"critical\"}]}",
+  "response": {
+    "summary": "Qualidade geral: o notebook está bem estruturado e reprodutível (roda do início ao fim, com split correto e cuidados para evitar vazamento de dados), mas a decisão é reprovar por um problema de confiabilidade na comunicação dos resultados. O achado mais importante é uma divergência crítica: o texto final afirma AUC 0,93, porém o resultado exibido anteriormente no teste é AUC 0,729 — isso muda a leitura de performance do modelo. Na entrevista, peça para o candidato explicar por que ocorreu essa discrepância, como ele validaria e reportaria métricas corretamente (incluindo checar outputs, logs e versões/seed), e como decidiria próximos passos para melhorar o AUC de forma verificável."
+  },
+  "usage": {
+    "prompt": 538,
+    "completion": 163
+  }
+}

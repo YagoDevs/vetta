@@ -1,0 +1,28 @@
+{
+  "notebook": "nb03_inflated.ipynb",
+  "findings": [
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "\"O modelo atinge AUC 0.93 no teste\"",
+      "evidence": "Na célula 8 o notebook imprime AUC_TEST=0.729. Diferença = 0.201 (>0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "Conclusão cita AUC 0.93 e afirma superar benchmarks do setor",
+      "evidence": "Nenhuma célula computa AUC=0.93; a única AUC computada/exibida é 0.729 (célula 8).",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 1,
+    "C4": 2
+  },
+  "weighted_score": 3.2,
+  "decision": "REPROVAR",
+  "summary": "REPROVAR. Metodologia e execução estão corretas (split antes do fit via Pipeline, seeds fixadas, sem evidência de leakage). Porém há quebra grave de integridade: a conclusão declara AUC 0.93, enquanto o output executado mostra AUC_TEST=0.729 (E1) e não existe célula que produza 0.93 (E4). Além disso, a recomendação \"pronto para produção\" não é suportada pelos números apresentados (recall 0.119 com limiar 0.5). Score ponderado = 0.30*5 + 0.20*5 + 0.30*1 + 0.20*2 = 3.2, mas há critério 1 (C3), logo reprova pela regra."
+}

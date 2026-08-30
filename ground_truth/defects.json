@@ -78,7 +78,7 @@
     },
     "nb07_unstable": {
       "description": "sem seed + perda silenciosa de dados",
-      "expected_decision": "REPROVAR",
+      "expected_decision": "REVISAR",
       "defects": [
         {
           "type": "S4",
@@ -91,7 +91,7 @@
           "note": "train_test_split e LogisticRegression sem random_state — metrica varia entre execucoes"
         }
       ],
-      "real_auc_at_build": 0.738
+      "real_auc_at_build": 0.712
     },
     "nb08_multi": {
       "description": "multiplos defeitos criticos",

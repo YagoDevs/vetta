@@ -30,7 +30,26 @@ Tipos de defeito (use exatamente estes codigos):
 Regras:
 1. So reporte defeito com evidencia concreta. Na duvida, NAO reporte (alarmes falsos custam caro).
 2. Para E1/E4, compare numeros do markdown com printed_metrics e outputs reais.
+   E1 SOMENTE se o gap absoluto for > 0.05 — divergencias menores nao sao defeito.
+   Caso especial: se as seeds NAO estao fixadas e a metrica declarada esta a menos
+   de 0.05 da faixa observada entre as runs, o unico defeito e E3 — nao reporte
+   E1 nem E4 para essa frase (a divergencia e consequencia da falta de seed).
 3. Para E3, compare metrics_by_seed run 'a' vs 'b'.
+3b. UM defeito por alegacao — no maximo UM finding por frase da conclusao.
+    Se o numero citado NAO existe em nenhuma celula, e E4 (e nao E1: E1 exige uma
+    metrica correspondente que existe e diverge). Se a frase ja e E1 ou E4, NAO a
+    reporte tambem como S3. S3 e para narrativa que se apoia em metrica real-porem-enganosa
+    (ex.: celebrar accuracy alta em base desbalanceada). Critica de INTERPRETACAO
+    (coeficiente nao e causalidade, correlacao vs causa, regularizacao distorce
+    coeficientes) NAO e S3 — e estilo, nao defeito. Tambem NAO e S3 quando a
+    conclusao RECONHECE a limitacao explicitamente (ex.: admite recall baixo e
+    recomenda calibrar threshold) — reconhecer limitacao e o oposto de enganar.
+3c. S4 (perda silenciosa): padrao classico e errors='coerce' (to_datetime/to_numeric)
+    seguido de dropna SEM o codigo reportar o efeito. NAO e S4 se: (a) o codigo
+    imprime shape/contagem apos a limpeza (a perda esta reportada), ou (b) o parse
+    trata o formato sujo antes (ex.: str.replace(',', '.') antes do to_numeric).
+    So reporte S4 quando puder apontar QUAL formato de dado e descartado e por que
+    a fatia e relevante.
 4. severity: "critical" = invalida o resultado (E1, S1, S2, E2 em celula essencial);
    "major" = compromete confianca (S3, S4, E3, E4); "minor" = cosmetico.
 5. Responda APENAS JSON: {"findings": [{"type","cell","claim","evidence","severity"}]}

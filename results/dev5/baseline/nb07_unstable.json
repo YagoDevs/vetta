@@ -1,0 +1,21 @@
+{
+  "notebook": "nb07_unstable.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 3,
+      "claim": "\"O CSV tem decimais com vírgula, datas em dois formatos ... tratamos tudo explicitamente.\"",
+      "evidence": "A limpeza força `reference_date` no formato '%Y-%m-%d' com `errors='coerce'` e depois executa `df = df.dropna(subset=['reference_date', 'total_charges'])`. Isso descarta silenciosamente todas as linhas com data em outro formato (viram NaT) e também linhas onde `total_charges` não parseou. Não há nenhuma célula reportando quantas linhas foram removidas (antes/depois) ou qual fatia foi afetada.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 2,
+    "C2": 3,
+    "C3": 5,
+    "C4": 3
+  },
+  "weighted_score": 3.3,
+  "decision": "REVISAR",
+  "summary": "Defeito reportado: S4 (perda silenciosa de dados na limpeza ao coagir datas/valores e dropar NaT/NaN sem quantificar). Metodologia de split/preprocess está correta (sem leakage), mas há problema de integridade de dados. Métricas no texto batem com os outputs (AUC 0.738). Score ponderado = 0.30*2 + 0.20*3 + 0.30*5 + 0.20*3 = 3.3 => decisão sugerida: REVISAR (C1=2 e score entre 2.5-3.4)."
+}
