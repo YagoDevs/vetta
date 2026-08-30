@@ -1,0 +1,42 @@
+{
+  "notebook": "nb05_elisa_martins.ipynb",
+  "findings": [
+    {
+      "type": "E2",
+      "cell": 8,
+      "claim": "Notebook runs end-to-end.",
+      "evidence": "Cell 8 references `importances` which is never defined and the executed output shows: `ERROR NameError: name 'importances' is not defined`.",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "“0.80 recall on the prepaid segment”.",
+      "evidence": "No cell computes segment-level recall and the only recall printed is overall `RECALL_TEST=0.119` in cell 9. There is no computation for a “prepaid segment” metric.",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 11,
+      "claim": "“0.80 recall …” / “model performs well”.",
+      "evidence": "Executed metrics show `RECALL_TEST=0.119` (cell 9), which diverges from 0.80 by 0.681 (>0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 11,
+      "claim": "“The model performs well…” (implicitly supported by accuracy).",
+      "evidence": "Cell 9 reports `ACC_TEST=0.853` with churn rate 0.157 (cell 5) and very low recall (0.119). If leaning on accuracy here, it is misleading for an imbalanced setting; the text does not discuss the low recall or thresholding trade-offs.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 1,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.0,
+  "decision": "REPROVAR",
+  "summary": "Defects: E2 (cell breaks due to undefined variable), E4/E1 (conclusion cites a segment recall that is never computed and contradicts the measured recall), and S3 (conclusion implies strong performance despite very low recall; accuracy is not an appropriate headline metric here without discussion). Methodology for leakage looks correct (pipeline fit after split), but the misleading evaluation and integrity/execution issues are critical. Weighted score = 1.0 -> Decision: REJECT."
+}

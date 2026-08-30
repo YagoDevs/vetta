@@ -1,0 +1,42 @@
+{
+  "notebook": "nb08_henrique_silva.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "\"Stratified split BEFORE any transformation; preprocessing learns from the training set only.\"",
+      "evidence": "Cell 7 scales numeric columns on the full dataframe before the train/test split: `df[num] = StandardScaler().fit_transform(df[num])` happens before `train_test_split(...)`. This fits the scaler on test data too (leakage).",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "\"Excellent result: 0.97 AUC and 0.91 precision on fiber customers\"",
+      "evidence": "Cell 8 reports `AUC_TEST=0.729` (not 0.97). No precision metric is computed anywhere, and nothing is filtered to 'fiber customers'. The AUC gap is 0.241 (>0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "\"0.91 precision on fiber customers\"",
+      "evidence": "No cell computes precision at all (only AUC/recall/accuracy in cell 8), and no evaluation is done on a fiber-only subset. The cited number is not produced by the notebook.",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "\"prove the model is ready\" based on reported performance",
+      "evidence": "Churn rate is 0.157 (cell 5). The model’s recall at the stated threshold is `RECALL_TEST=0.119` (cell 8), yet the conclusion asserts readiness without addressing the very low recall; also accuracy (0.853) is presented in cell 8 without any discussion of imbalance/thresholding trade-offs.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "Critical issues: (1) data leakage from scaling before the split (cell 7), (2) conclusion reports metrics that contradict outputs (AUC 0.97 vs 0.729) and cites an uncomputed precision-on-fiber number, and (3) the notebook leans on misleading readiness/accuracy despite very low recall on an imbalanced target. Decision: REJECT. Weighted score = 0.30*1 + 0.20*5 + 0.30*1 + 0.20*1 = 1.80."
+}

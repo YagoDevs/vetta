@@ -1,0 +1,133 @@
+{
+  "notebook": "nb04_diego_rocha.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "The notebook claims: “Stratified split BEFORE any transformation; preprocessing learns from the training set only.”",
+      "evidence": "In cell 7, numeric columns are scaled on the full dataset before the train/test split: `df[num] = StandardScaler().fit_transform(df[num])` happens prior to `train_test_split(...)`. This fits the scaler on both train and test data (data leakage), contradicting the claim that preprocessing learns only from training data.",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "“The model achieves 0.853 accuracy, an excellent performance, getting the vast majority of customers right. The model is production-ready.”",
+      "evidence": "The dataset is imbalanced (cell 5 prints churn rate 0.157). While accuracy is 0.853 (cell 8), recall is only 0.119, meaning the model misses most churners. The conclusion leans on accuracy as “excellent performance” despite very low recall for the minority (churn) class, which is typically the key business outcome in churn prediction.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 5,
+    "C4": 2
+  },
+  "weighted_score": 3.2,
+  "decision": "REPROVAR",
+  "summary": "Overall quality is mixed: the notebook runs end-to-end and reports metrics consistently, but it has a serious evaluation flaw. The most important issue is data leakage: the feature scaling is fit on the full dataset before the train/test split, which makes the reported test performance unreliable and suggests a gap in basic ML methodology. A second concern is that the conclusion relies on accuracy despite a highly imbalanced churn rate and very low churn recall, meaning the model would miss most customers who actually churn. In interview, ask her to explain how to structure preprocessing with a Pipeline (fit on training only), how she would evaluate an imbalanced churn model (recall/precision, PR-AUC, thresholding), and what changes she would make before calling a model “production-ready.”",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(remainder='passthrough',\n                                   transformers=[('c',\n                                                  OneHotEncoder(handle_unknown='ignore'),\n                                                  ['region', 'plan_type',\n                                                   'contract_type',\n                                                   'internet_tech'])])),\n                ('clf', LogisticRegression(max_iter=1000"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual      -0.41\nc__contract_type_monthly      0.41\nremainder__tenure_months     -0.39\nremainder__n_support_calls    0.34\nremainder__n_complaints       0.32\nremainder__total_charges     -0.28\nremainder__monthly_charges    0.25\nremainder__late_payment       0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S1",
+          "cell": 7,
+          "claim": "The notebook claims: “Stratified split BEFORE any transformation; preprocessing learns from the training set only.”",
+          "evidence": "In cell 7, numeric columns are scaled on the full dataset before the train/test split: `df[num] = StandardScaler().fit_transform(df[num])` happens prior to `train_test_split(...)`. This fits the scaler on both train and test data (data leakage), contradicting the claim that preprocessing learns only from training data.",
+          "severity": "critical"
+        },
+        {
+          "type": "S3",
+          "cell": 10,
+          "claim": "“The model achieves 0.853 accuracy, an excellent performance, getting the vast majority of customers right. The model is production-ready.”",
+          "evidence": "The dataset is imbalanced (cell 5 prints churn rate 0.157). While accuracy is 0.853 (cell 8), recall is only 0.119, meaning the model misses most churners. The conclusion leans on accuracy as “excellent performance” despite very low recall for the minority (churn) class, which is typically the key business outcome in churn prediction.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 1,
+        "C2": 5,
+        "C3": 5,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "Cell 7 fits `StandardScaler()` on the full dataset before `train_test_split`, leaking test-set information into training; this is a critical methodology failure (verified finding S1). Although the split is stratified and AUC is computed, the leakage forces C1=1 per rubric.",
+        "C2": "The notebook executes end-to-end without exceptions: data loads (cell 1), cleaning completes with 0 nulls (cell 3), model fits (cell 7), and metrics print successfully (cell 8). Random seeds are fixed in both the split and logistic regression (`random_state=42`).",
+        "C3": "The stated numeric result in the narrative matches the executed output: the conclusion cites accuracy 0.853 and cell 8 prints `ACC_TEST=0.853`. No other metrics are claimed in text, and the recorded real metrics align with the notebook outputs.",
+        "C4": "The conclusion overstates performance and production readiness based on accuracy alone, despite the imbalanced churn rate (0.157 in cell 5) and very low churn recall (0.119 in cell 8), meaning most churners are missed (verified finding S3). The recommendation is not adequately supported by the key minority-class outcome."
+      }
+    }
+  ]
+}

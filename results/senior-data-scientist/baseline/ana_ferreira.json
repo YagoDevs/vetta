@@ -1,0 +1,21 @@
+{
+  "notebook": "ana_ferreira.ipynb",
+  "findings": [
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "Conclusion emphasizes overall performance (AUC 0.729) and recommends targeting based on the model, while recall at 0.5 is extremely low.",
+      "evidence": "Cell 8 shows RECALL_TEST=0.119 with churn base rate 0.157 (cell 5). Despite noting recall is low, the narrative still leans on AUC as the success metric without showing any threshold tuning, PR-AUC, lift/precision-at-k, or cost-based operating point—key for an imbalanced retention campaign.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 5,
+    "C4": 3
+  },
+  "weighted_score": 3.4,
+  "decision": "REPROVAR",
+  "summary": "Defects: S3 (misleading metric emphasis for a churn/retention use case). Methodology otherwise correctly avoids leakage via a Pipeline with a stratified split before fitting; execution is stable (seeds fixed) and the written AUC matches the computed output. However, given recall=0.119 at the stated decision rule, the notebook does not provide an evaluation aligned with the business action (campaign targeting), making C1 critical. Weighted score = 0.30*1 + 0.20*5 + 0.30*5 + 0.20*3 = 3.4. Decision: REJECT because C1=1."
+}

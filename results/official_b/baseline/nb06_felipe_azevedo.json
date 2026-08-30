@@ -1,0 +1,35 @@
+{
+  "notebook": "nb06_felipe_azevedo.ipynb",
+  "findings": [
+    {
+      "type": "S2",
+      "cell": 6,
+      "claim": "Creates a “composite risk feature”.",
+      "evidence": "Cell 6 defines `df['risk_score'] = df['churned'] * df['n_complaints'] + df['late_payment']`, which directly uses the target `churned` to build an input feature later included in `X` (cell 8). This is target leakage.",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 9,
+      "claim": "Model evaluation presented; includes ACC_TEST=0.913 on churn rate 0.157.",
+      "evidence": "Churn rate is 0.157 (cell 5), i.e., imbalanced. Cell 9 reports accuracy (0.913) without any discussion of imbalance or thresholding; accuracy can be misleading here (e.g., predicting all non-churn already yields ~0.843).",
+      "severity": "major"
+    },
+    {
+      "type": "E1",
+      "cell": 11,
+      "claim": "“With the new risk feature the model reaches AUC 0.99.”",
+      "evidence": "Cell 9 prints `AUC_TEST=0.858`. The text claims 0.99, a divergence of 0.132 (>0.05).",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "Decision: REJECT. Critical issues: (1) target leakage via `risk_score` built from `churned` and then used as a feature; (2) written conclusion claims AUC 0.99 while the executed notebook shows AUC 0.858; (3) conclusions therefore are not supported by the produced results. Code executes deterministically and cleanly, but methodology and result integrity fail."
+}

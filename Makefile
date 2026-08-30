@@ -10,18 +10,18 @@ data:             ## regenera o dataset sintetico (deterministico, seed 42)
 notebooks:        ## regenera os 8 notebooks de teste + gabarito
 	$(VENV)/python scripts/build_notebooks.py
 
-reproduce:        ## OFFLINE, sem chave: replay das 3 runs oficiais + avaliacao
-	for run in official_a official_b official_c; do \
-	  $(VENV)/python vetta.py run notebooks/ --mode replay --run-id $$run; \
-	  $(VENV)/python baseline.py notebooks/ --mode replay --run-id $$run; \
-	  $(VENV)/python evaluate.py --run-id $$run; \
+reproduce:        ## OFFLINE, no key needed: replay of the 3 official runs + evaluation
+	set -e; for run in official_a official_b official_c; do \
+	  $(VENV)/python vetta.py run notebooks/ --mode replay --run-id $$run && \
+	  $(VENV)/python baseline.py notebooks/ --mode replay --run-id $$run && \
+	  $(VENV)/python evaluate.py --run-id $$run || exit 1; \
 	done
 
-rerun:            ## refaz tudo AO VIVO (requer OPENAI_API_KEY no .env, ~US$2)
-	for run in fresh_a fresh_b fresh_c; do \
-	  $(VENV)/python vetta.py run notebooks/ --mode live --run-id $$run; \
-	  $(VENV)/python baseline.py notebooks/ --mode live --run-id $$run; \
-	  $(VENV)/python evaluate.py --run-id $$run; \
+rerun:            ## redo everything LIVE (requires OPENAI_API_KEY in .env, ~US$2)
+	set -e; for run in fresh_a fresh_b fresh_c; do \
+	  $(VENV)/python vetta.py run notebooks/ --mode live --run-id $$run && \
+	  $(VENV)/python baseline.py notebooks/ --mode live --run-id $$run && \
+	  $(VENV)/python evaluate.py --run-id $$run || exit 1; \
 	done
 
 smoke:            ## 1 notebook ao vivo, ~30s, ~US$0.05 (valida a chave/setup)

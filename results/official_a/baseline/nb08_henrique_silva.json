@@ -1,0 +1,42 @@
+{
+  "notebook": "nb08_henrique_silva.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "“Stratified split BEFORE any transformation; preprocessing learns from the training set only.”",
+      "evidence": "Cell 7 fits the scaler on the full dataset before the split: `df[num] = StandardScaler().fit_transform(df[num])` occurs before `train_test_split(...)`. This leaks test-set distribution information into training.",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "“Excellent result: 0.97 AUC and 0.91 precision on fiber customers…”",
+      "evidence": "Cell 8 reports `AUC_TEST=0.729` (not 0.97). No cell reports any precision metric, and nothing computes “precision on fiber customers”. The AUC gap is 0.241 (> 0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "“0.91 precision on fiber customers”",
+      "evidence": "The notebook computes AUC, recall, and accuracy only (cell 8). There is no computation of precision, nor any segment-specific evaluation for fiber customers.",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 8,
+      "claim": "Implicitly presenting the model as strong using ACC_TEST=0.853 on an imbalanced base.",
+      "evidence": "Churn base rate is 0.157 (cell 5). Accuracy 0.853 can be largely explained by class imbalance; moreover recall is 0.119 (cell 8), indicating very poor sensitivity. The conclusion does not discuss imbalance or thresholding tradeoffs and instead declares readiness.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "Decision: REJECT. Critical methodology leakage (scaler fit on full data before split) contradicts the stated approach. The written conclusions cite metrics not produced and materially contradict the executed results (AUC 0.729 vs claimed 0.97; no computed precision, no fiber-segment evaluation). Communication is not supported by the numbers and ignores very low recall in an imbalanced churn setting. Weighted score = 0.30*1 + 0.20*5 + 0.30*1 + 0.20*1 = 1.8."
+}

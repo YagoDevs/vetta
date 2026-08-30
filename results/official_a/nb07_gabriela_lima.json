@@ -1,0 +1,120 @@
+{
+  "notebook": "nb07_gabriela_lima.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 2,
+      "claim": "Markdown claims: “The CSV has comma decimals, dates in two formats and inconsistent categories. Everything is handled explicitly.”",
+      "evidence": "In cleaning (cell 3) dates are parsed with a single ISO format (format='%Y-%m-%d', errors='coerce'), then rows with NaT reference_date or missing total_charges are dropped (df.dropna(subset=['reference_date','total_charges'])). There is no reporting of how many rows were coerced to NaT or dropped, so any non-ISO date format is silently discarded despite the claim of handling two date formats explicitly.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 2,
+    "C2": 5,
+    "C3": 5,
+    "C4": 3
+  },
+  "weighted_score": 3.7,
+  "decision": "REVISAR",
+  "summary": "Overall, the notebook is well-structured and runs end-to-end with clean, reproducible code (including a proper sklearn Pipeline/ColumnTransformer and a leakage-safe split). The most important issue is that it evaluates the model mainly with accuracy despite a strong class imbalance, resulting in very low recall (0.084) — meaning it would miss most churners and is not yet usable for retention targeting without threshold/metric tuning. There is also a major documentation mismatch: the write-up claims two date formats are handled explicitly, but the code parses only one format and silently drops unparsed dates, without reporting how many records were lost. In the interview, verify that the candidate can choose appropriate metrics for imbalanced classification (recall/precision, PR-AUC), tune decision thresholds, and explain/quantify data cleaning impacts (how many rows are coerced/dropped and how to correctly handle multiple date formats).",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.709,
+          "RECALL_TEST": 0.065,
+          "ACC_TEST": 0.849
+        },
+        "b": {
+          "AUC_TEST": 0.7,
+          "RECALL_TEST": 0.065,
+          "ACC_TEST": 0.85
+        }
+      },
+      "safety_flags": []
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.709,
+          "RECALL_TEST": 0.065,
+          "ACC_TEST": 0.849
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.7,
+          "RECALL_TEST": 0.065,
+          "ACC_TEST": 0.85
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "ok\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.153\ncontract_type\nannual     0.098\nmonthly    0.191\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.709\nRECALL_TEST=0.065\nACC_TEST=0.849\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.41\nc__contract_type_monthly    0.41\nn__total_charges           -0.38\nn__n_support_calls          0.36\nn__n_complaints             0.34\nn__tenure_months           -0.33\nn__monthly_charges          0.24\nn__late_payment             0.17\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S4",
+          "cell": 2,
+          "claim": "Markdown claims: “The CSV has comma decimals, dates in two formats and inconsistent categories. Everything is handled explicitly.”",
+          "evidence": "In cleaning (cell 3) dates are parsed with a single ISO format (format='%Y-%m-%d', errors='coerce'), then rows with NaT reference_date or missing total_charges are dropped (df.dropna(subset=['reference_date','total_charges'])). There is no reporting of how many rows were coerced to NaT or dropped, so any non-ISO date format is silently discarded despite the claim of handling two date formats explicitly.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 2,
+        "C2": 5,
+        "C3": 5,
+        "C4": 3
+      },
+      "justifications": {
+        "C1": "The split is stratified and done before fitting the pipeline (cell 7), so there’s no leakage. However, the notebook relies on accuracy (cell 8) despite strong class imbalance (churn rate 0.153 in cell 5) and produces very low recall (0.084), with no thresholding/metric discussion; per verified S4, the cleaning narrative overstates explicit handling of two date formats (cell 2 vs cell 3).",
+        "C2": "The notebook executes end-to-end without exceptions and produces stable outputs as shown (cells 1, 3, 5, 7–9). Code is reasonably clean and uses a Pipeline/ColumnTransformer correctly (cell 7).",
+        "C3": "The only quantitative claim in the write-up matches executed results within tolerance: the conclusion states AUC 0.721 (cell 10) and the executed output is AUC_TEST=0.720 (cell 8). Other statements (e.g., key drivers) are supported by the coefficient table (cell 9).",
+        "C4": "Conclusions are directionally supported (monthly contracts/complaints have positive coefficients in cell 9), but they are generic and don’t grapple with the model’s operational weakness (recall 0.084 in cell 8) or what action/thresholding would be needed for retention targeting. The narrative also overclaims cleaning completeness per verified S4 (cell 2 vs cell 3)."
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "notebook": "gabriela_lima.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 3,
+      "claim": "Markdown (cell 2): \"dates in two formats ... Everything is handled explicitly.\"",
+      "evidence": "Code parses dates with a single format (\"%Y-%m-%d\") and coerces other formats to NaT, then drops rows with NaT in reference_date and NaN in total_charges: `df = df.dropna(subset=['reference_date', 'total_charges'])`. The notebook never reports how many rows were removed (only prints 'ok'), so a potentially relevant share of rows can be silently lost.",
+      "severity": "high"
+    }
+  ],
+  "scores": {
+    "C1": 3,
+    "C2": 4,
+    "C3": 5,
+    "C4": 3
+  },
+  "weighted_score": 3.8,
+  "decision": "AVANCAR",
+  "summary": "Defects found: S4 (silent data loss) due to dropping rows after strict date parsing and coercion without reporting the number/percentage removed. Methodology is otherwise mostly correct: split happens before preprocessing via a Pipeline/ColumnTransformer and the chosen main metric (AUC) is appropriate given ~15% churn. Code executes as delivered; minor reproducibility risk exists because train_test_split has no random_state, but no evidence is shown of material run-to-run variation. Reported AUC (0.721) matches the executed output, and conclusions are reasonable but fairly generic (no action thresholding despite very low recall at 0.5). Decision per rubric: REVIEW (weighted score = 0.30*3 + 0.20*4 + 0.30*5 + 0.20*3 = 3.80, but criterion C4 is only 3 and there is a non-trivial data integrity/messiness handling issue via silent row drops)."
+}

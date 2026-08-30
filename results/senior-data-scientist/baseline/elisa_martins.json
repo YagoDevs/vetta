@@ -1,0 +1,28 @@
+{
+  "notebook": "elisa_martins.ipynb",
+  "findings": [
+    {
+      "type": "E2",
+      "cell": 8,
+      "claim": "Notebook should run end-to-end in order.",
+      "evidence": "Cell 8 errors with `NameError: name 'importances' is not defined` due to `seg = importances.sort_values(...)` where `importances` is never created in any prior cell.",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "“0.80 recall on the prepaid segment”",
+      "evidence": "No cell computes recall by segment (and there is no visible “prepaid segment” variable in the features; `plan_type` exists but no segment metric is produced). The only recall computed is overall `RECALL_TEST=0.119` in cell 9.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 1,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 2.2,
+  "decision": "REPROVAR",
+  "summary": "Defects: (1) The notebook does not execute cleanly because a cell references an undefined variable (`importances`). (2) The written conclusion cites a segment recall (0.80 on “prepaid”) that is not computed anywhere and contradicts the only computed recall (0.119). Methodology for splitting and preprocessing is correct (pipeline with stratified split before fitting), but execution and result integrity are critically broken. Weighted score = 2.20. Decision: REJECT."
+}

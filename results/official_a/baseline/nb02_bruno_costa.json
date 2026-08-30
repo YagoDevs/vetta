@@ -1,0 +1,21 @@
+{
+  "notebook": "nb02_bruno_costa.ipynb",
+  "findings": [
+    {
+      "type": "S3",
+      "cell": 8,
+      "claim": "The notebook reports ACC_TEST=0.845 alongside AUC/recall without explicitly warning that accuracy is inflated by the imbalanced churn base rate.",
+      "evidence": "Churn rate printed in cell 5 is 0.157 (i.e., majority class non-churn ≈0.843). In cell 8, ACC_TEST=0.845 while RECALL_TEST=0.089 at threshold 0.5, indicating accuracy is close to the naive majority baseline and not a meaningful success metric here; the narrative does not call out the accuracy pitfall explicitly.",
+      "severity": "high"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 5,
+    "C4": 4
+  },
+  "weighted_score": 3.6,
+  "decision": "REPROVAR",
+  "summary": "Methodology is mostly solid (split before preprocessing via a Pipeline; appropriate AUC reported; leakage not observed). However, the notebook surfaces accuracy on an imbalanced problem (15.7% churn) without explicitly warning that it is misleading; the achieved 0.845 accuracy is essentially the majority-class baseline, while recall is 0.089. Code executes cleanly with fixed seeds and the written AUC matches outputs. Conclusions are generally supported and acknowledge the recall/threshold limitation, but should more directly de-emphasize accuracy and propose thresholding/cost-based evaluation as the primary metric for campaign use. Decision: REJECT due to critical metric-misleading issue (C1=1)."
+}

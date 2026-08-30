@@ -1,0 +1,35 @@
+{
+  "notebook": "nb05_elisa_martins.ipynb",
+  "findings": [
+    {
+      "type": "E2",
+      "cell": 8,
+      "claim": "Per-segment analysis is executed.",
+      "evidence": "Cell 8 errors: `NameError: name 'importances' is not defined` due to `seg = importances.sort_values(...)` where `importances` was never created.",
+      "severity": "high"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "“0.80 recall on the prepaid segment”.",
+      "evidence": "No cell computes segment-level recall, and there is no segment variable/filter shown. The only recall computed is overall `RECALL_TEST=0.119` in cell 9.",
+      "severity": "high"
+    },
+    {
+      "type": "S3",
+      "cell": 11,
+      "claim": "“The model performs well…” leaning on recall/segment claim without acknowledging poor achieved recall at default threshold.",
+      "evidence": "Executed metrics show `RECALL_TEST=0.119` (cell 9) with churn rate 0.157 (cell 5). The conclusion asserts strong capture of churn (0.80 recall) without any supporting computation and despite the low measured recall at threshold 0.5.",
+      "severity": "high"
+    }
+  ],
+  "scores": {
+    "C1": 3,
+    "C2": 1,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.6,
+  "decision": "REPROVAR",
+  "summary": "Defects: (E2) notebook does not run end-to-end due to undefined variable in cell 8; (E4) conclusion cites a segment recall (0.80) that is never computed anywhere; (S3) conclusion frames performance as strong while the only computed recall is 0.119 on the test set. Scores: C1=3 (proper stratified split + pipeline avoids leakage, metrics include AUC for imbalance), C2=1 (runtime error), C3=1 (unsupported/incorrect reported result), C4=1 (conclusions not supported by computed numbers). Decision by rules: REJECT (at least one criterion=1)."
+}

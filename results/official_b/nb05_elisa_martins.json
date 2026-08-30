@@ -1,0 +1,154 @@
+{
+  "notebook": "nb05_elisa_martins.ipynb",
+  "findings": [
+    {
+      "type": "E2",
+      "cell": 8,
+      "claim": "The notebook includes a per-segment analysis cell, but it does not run successfully.",
+      "evidence": "Execution failed at cell 8 with `NameError: name 'importances' is not defined` (variable `importances` is never created in any prior cell).",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 11,
+      "claim": "\"0.80 recall on the prepaid segment\"",
+      "evidence": "No segment-level recall is computed anywhere. The only recall printed is overall test recall at threshold 0.5: `RECALL_TEST=0.119` (cell 9). This differs from 0.80 by 0.681 (> 0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "\"The feature importances confirm tenure and complaints as the main drivers.\"",
+      "evidence": "No cell computes any feature importance object. The attempted importances-based segment analysis errors in cell 8 due to `importances` being undefined; only logistic regression coefficients are printed in cell 10.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 1,
+    "C3": 1,
+    "C4": 2
+  },
+  "weighted_score": 2.4,
+  "decision": "REPROVAR",
+  "summary": "Overall quality is below the bar because the notebook does not run end-to-end and the write-up contains unsupported (and conflicting) performance claims. The most important issue is a critical execution failure: a cell references an undefined variable (`importances`), so the analysis cannot be reproduced as submitted. There is also a major results-integrity problem: the narrative claims “0.80 recall on the prepaid segment,” but no segment recall is computed and the only reported test recall is 0.119, which contradicts the conclusion. In interview, ask her to run the notebook cleanly from top to bottom, explain how she would compute segment-level metrics correctly, and show a valid way to produce and interpret feature importance (or model coefficients) without overclaiming model performance.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": false,
+      "error_cells": [
+        8
+      ],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": false,
+        "error_cells": [
+          {
+            "cell": 8,
+            "error": "NameError: name 'importances' is not defined"
+          }
+        ],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 10,
+            "outputs": [
+              "c__contract_type_annual    -0.41\nc__contract_type_monthly    0.41\nn__tenure_months           -0.39\nn__n_support_calls          0.33\nn__n_complaints             0.32\nn__total_charges           -0.27\nn__monthly_charges          0.25\nn__late_payment             0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "E2",
+          "cell": 8,
+          "claim": "The notebook includes a per-segment analysis cell, but it does not run successfully.",
+          "evidence": "Execution failed at cell 8 with `NameError: name 'importances' is not defined` (variable `importances` is never created in any prior cell).",
+          "severity": "critical"
+        },
+        {
+          "type": "E1",
+          "cell": 11,
+          "claim": "\"0.80 recall on the prepaid segment\"",
+          "evidence": "No segment-level recall is computed anywhere. The only recall printed is overall test recall at threshold 0.5: `RECALL_TEST=0.119` (cell 9). This differs from 0.80 by 0.681 (> 0.05).",
+          "severity": "critical"
+        },
+        {
+          "type": "E4",
+          "cell": 11,
+          "claim": "\"The feature importances confirm tenure and complaints as the main drivers.\"",
+          "evidence": "No cell computes any feature importance object. The attempted importances-based segment analysis errors in cell 8 due to `importances` being undefined; only logistic regression coefficients are printed in cell 10.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 1,
+        "C3": 1,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "The notebook performs a stratified train/test split before fitting any transformers, and all preprocessing is inside an sklearn Pipeline/ColumnTransformer fit on X_tr only (cell 7), avoiding leakage. It also uses AUC (cell 9) and explicitly handles messy formats (comma decimals, mixed dates, inconsistent categories) in cleaning (cell 3).",
+        "C2": "Execution is not end-to-end: cell 8 raises a NameError because `importances` is never defined, which is a critical E2 execution failure. This means the notebook cannot be run cleanly in order without errors.",
+        "C3": "The written claim of “0.80 recall on the prepaid segment” (cell 11) is not produced anywhere, and the only executed recall is RECALL_TEST=0.119 (cell 9), a >0.05 divergence (critical E1). Additionally, the text refers to “feature importances” while no importance computation exists and the attempted importances cell fails (cell 8), further breaking result integrity.",
+        "C4": "The conclusion is not supported by executed evidence: it asserts strong segment recall and feature importances that are neither computed nor shown (cell 11; cell 8 errors). While coefficients are shown (cell 10), the narrative overclaims model performance (“performs well”) despite very low recall at the stated threshold (cell 9), so communication is weak and partially misleading."
+      }
+    }
+  ]
+}

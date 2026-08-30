@@ -1,0 +1,21 @@
+{
+  "notebook": "nb02_bruno_costa.ipynb",
+  "findings": [
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "Conclusion relies on the model performance without addressing that, at the default threshold, the classifier barely catches churners.",
+      "evidence": "Cell 8 shows RECALL_TEST=0.089 while churn rate is 0.157 (cell 5). Yet the conclusion focuses on AUC and recommendations without quantifying/mitigating the extremely low recall aside from a brief note. This can mislead stakeholders if they interpret the model as effective for targeting at the shown operating point.",
+      "severity": "medium"
+    }
+  ],
+  "scores": {
+    "C1": 3,
+    "C2": 5,
+    "C3": 5,
+    "C4": 4
+  },
+  "weighted_score": 4.2,
+  "decision": "AVANCAR",
+  "summary": "Methodology is mostly correct: split happens before preprocessing and is implemented via a Pipeline (no leakage). However, the reporting can be misleading for an imbalanced problem because the displayed operating-point metrics include very low recall (0.089) while accuracy is high (0.845) on a 15.7% churn base; the narrative emphasizes AUC and business actions without fully grounding them in an effective decision threshold/PR-type evaluation. Code runs cleanly with fixed seeds and outputs match the written metrics and conclusions. Weighted score = 0.30*3 + 0.20*5 + 0.30*5 + 0.20*4 = 4.2. Decision per rules: ADVANCE (no criterion ≤2)."
+}

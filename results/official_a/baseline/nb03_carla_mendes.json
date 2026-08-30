@@ -1,0 +1,21 @@
+{
+  "notebook": "nb03_carla_mendes.ipynb",
+  "findings": [
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "“The model reaches AUC 0.93 on the test set”",
+      "evidence": "Cell 8 prints AUC_TEST=0.729, not 0.93 (difference 0.201 > 0.05).",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 1,
+    "C4": 2
+  },
+  "weighted_score": 3.2,
+  "decision": "REPROVAR",
+  "summary": "Defect found: E1. The written conclusion claims test AUC=0.93, but the executed code reports AUC_TEST=0.729. Methodology is otherwise solid (stratified split before fitting; preprocessing inside a Pipeline; no evident leakage). Code executes cleanly and is reproducible (fixed random_state). However, result integrity fails due to the large metric mismatch, and the conclusion overstates readiness/quality while recall is very low (0.119 at 0.5 threshold). Decision by rubric: REJECT (C3=1)."
+}

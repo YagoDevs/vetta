@@ -1,0 +1,21 @@
+{
+  "notebook": "nb03_carla_mendes.ipynb",
+  "findings": [
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "“The model reaches AUC 0.93 on the test set”",
+      "evidence": "Cell 8 prints AUC_TEST=0.729, not 0.93 (difference 0.201 > 0.05).",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 4,
+    "C2": 5,
+    "C3": 1,
+    "C4": 2
+  },
+  "weighted_score": 2.9,
+  "decision": "REPROVAR",
+  "summary": "Defect: The written conclusion claims test AUC=0.93, but the executed metric is AUC_TEST=0.729 (E1, critical). Methodology is largely correct (stratified split; preprocessing inside a Pipeline; appropriate AUC reported), and the notebook executes cleanly with fixed seeds. However, results integrity fails due to the large metric mismatch, and the conclusion (“excellent… production-ready”) is not supported by the actual AUC and very low recall (0.119). Decision per rubric: REJECT (C3=1)."
+}

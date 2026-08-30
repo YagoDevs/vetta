@@ -1,0 +1,28 @@
+{
+  "notebook": "nb06_felipe_azevedo.ipynb",
+  "findings": [
+    {
+      "type": "S2",
+      "cell": 6,
+      "claim": "A composite risk feature is created for modeling.",
+      "evidence": "Cell 6 builds df['risk_score'] = df['churned'] * df['n_complaints'] + df['late_payment'], which directly uses the target (churned) to construct a feature later included in X (cell 8). This leaks target information into training and test features.",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 11,
+      "claim": "\"With the new risk feature the model reaches AUC 0.99\".",
+      "evidence": "Cell 9 prints AUC_TEST=0.858. The stated 0.99 differs from the executed output by 0.132 (> 0.05).",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "Critical leakage: a model feature (risk_score) is computed using the target (churned), invalidating the evaluation. Additionally, the conclusion claims AUC 0.99 while the notebook output shows test AUC 0.858. Decision: REJECT (C1=1 and C3=1; weighted score 2.20)."
+}

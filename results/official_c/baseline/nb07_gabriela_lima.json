@@ -1,0 +1,21 @@
+{
+  "notebook": "nb07_gabriela_lima.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 3,
+      "claim": "\"Everything is handled explicitly.\" / cleaning step implies full, explicit handling of messy data.",
+      "evidence": "Cell 3 drops rows with missing/invalid parsed values: `df = df.dropna(subset=['reference_date', 'total_charges'])`, but no before/after row counts or % removed are reported. Given dates are parsed with a single strict format (`format='%Y-%m-%d'`) and 'anything else becomes NaT', this can discard a non-trivial share silently.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 4,
+    "C2": 3,
+    "C3": 5,
+    "C4": 3
+  },
+  "weighted_score": 3.9,
+  "decision": "REVISAR",
+  "summary": "Defects: S4 (silent data loss) due to dropping rows after strict date parsing without quantifying how many rows were removed. Methodology otherwise solid: split before preprocessing (no leakage) and AUC is used on an imbalanced target (15.3% churn). Code is mostly reproducible but train/test split has no `random_state`, so results can vary between runs (minor). Reported AUC in the conclusion matches the computed output. Weighted score = 0.30*4 + 0.20*3 + 0.30*5 + 0.20*3 = 3.9. Decision per rules: REVIEW (score >=3.5 but C2=3 and there is a non-critical execution/reproducibility issue plus a major data-integrity reporting gap)."
+}

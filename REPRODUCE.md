@@ -18,7 +18,8 @@ make notebooks             # regenerates the 8 test notebooks + ground_truth/def
 ```
 
 Note: `make notebooks` re-executes the notebooks on your machine. Everything is seeded
-except nb07 (the *unseeded* notebook — its instability is a planted defect, E3).
+except nb07 (Gabriela Lima, the *unseeded* notebook — its instability is a planted defect,
+E3). Replay is keyed by stage tag, so regenerating notebooks does NOT break `make reproduce`.
 
 ## 2. Reproduce the official results (OFFLINE — no key, no cost, ~2 min)
 
@@ -29,7 +30,7 @@ make reproduce
 This replays the recorded LLM responses (`runs/official_*/calls/`) through the full
 pipeline and re-derives every number in the README table deterministically. It proves the
 committed results follow from the committed inputs. Expected final output per run: the
-baseline-vs-agent metric table; `official_b` shows agent F1 0.88 vs baseline 0.769.
+baseline-vs-agent metric table; `official_b` shows agent F1 0.828 vs baseline 0.733.
 
 ## 3. Re-run live with your own key (optional, ~US$2, ~20 min)
 
@@ -40,8 +41,8 @@ make rerun                 # 3 fresh runs of agent + baseline + evaluation
 ```
 
 LLM outputs are non-deterministic: expect the numbers to move a little (we observed
-F1 ±0.03 across runs). The qualitative gap — agent ≫ baseline on execution-only (E)
-defects — persisted in every run we performed.
+F1 ±0.05 across runs). The qualitative signature — the baseline never catching the
+seed-instability defect (E3) while vetta usually does — persisted in every run we performed.
 
 Model: `gpt-5.2-2025-12-11` (dated snapshot, pinned in `adapters/llm.py`).
 
@@ -53,7 +54,7 @@ make serve                 # http://localhost:8000
 
 Single process: FastAPI serves the API and the committed frontend build, reading the
 official results. No database, no external services. Suggested tour: open
-`nb03_inflated` → cell 9 shows the claimed AUC 0.93 against the executed 0.729; the
+Carla Mendes → the flagged cell shows the claimed AUC 0.93 against the executed 0.729; the
 "Baseline vs. Vetta" tab shows the comparison table; decision buttons record the human
 call to `results/<run>/human_decisions.json`.
 

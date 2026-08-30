@@ -1,0 +1,133 @@
+{
+  "notebook": "gabriela_lima.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 3,
+      "claim": "In Cleaning, the notebook says: \"Everything is handled explicitly.\"",
+      "evidence": "The code coerces non-ISO dates to NaT via `pd.to_datetime(..., format='%Y-%m-%d', errors='coerce')` and then drops rows with missing `reference_date` or `total_charges` (`df = df.dropna(...)`), but it never reports how many rows were removed. This can silently discard the non-ISO date format rows and any rows with non-parsable charges.",
+      "severity": "major"
+    },
+    {
+      "type": "E3",
+      "cell": 7,
+      "claim": "The model result is presented as a single fixed test performance in the conclusion.",
+      "evidence": "The train/test split has no `random_state`, and metrics vary across runs: AUC 0.734 vs 0.728 (Δ=0.006), Recall 0.110 vs 0.084 (Δ=0.026), Accuracy 0.859 vs 0.854 (Δ=0.005). Recall varies by > 0.02, so the result is not reproducible as written.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 2,
+    "C2": 2,
+    "C3": 3,
+    "C4": 4
+  },
+  "weighted_score": 2.7,
+  "decision": "REVISAR",
+  "summary": "Overall the notebook is solid and mostly well-structured (proper use of Pipeline/ColumnTransformer and conclusions broadly supported by the model outputs), but it has a couple of important rigor gaps. The most important issue is that the cleaning step silently drops rows after coercing dates/charges, without reporting how many records were removed—this can change the dataset in a way that’s easy to miss and undermines methodological transparency. Results are also not fully reproducible because the train/test split lacks a fixed random seed, and key metrics (notably recall) vary meaningfully across runs; there’s also a small mismatch between the AUC cited in the text and the executed output. In the interview, ask her to explain how she would make the pipeline reproducible, how she would quantify and justify any dropped/invalid records, and how she would choose/report a threshold given the very low recall at 0.5. Relative to the role requirements, she shows good business framing but needs stronger rigor and clearer reporting of data handling and limitations.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.734,
+          "RECALL_TEST": 0.11,
+          "ACC_TEST": 0.859
+        },
+        "b": {
+          "AUC_TEST": 0.728,
+          "RECALL_TEST": 0.084,
+          "ACC_TEST": 0.854
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.734,
+          "RECALL_TEST": 0.11,
+          "ACC_TEST": 0.859
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.728,
+          "RECALL_TEST": 0.084,
+          "ACC_TEST": 0.854
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "ok\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.153\ncontract_type\nannual     0.098\nmonthly    0.191\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.734\nRECALL_TEST=0.110\nACC_TEST=0.859\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.46\nc__contract_type_monthly    0.46\nn__tenure_months           -0.44\nn__n_support_calls          0.35\nn__n_complaints             0.33\nc__internet_tech_dsl       -0.19\nn__has_autopay             -0.18\nn__monthly_charges          0.17\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S4",
+          "cell": 3,
+          "claim": "In Cleaning, the notebook says: \"Everything is handled explicitly.\"",
+          "evidence": "The code coerces non-ISO dates to NaT via `pd.to_datetime(..., format='%Y-%m-%d', errors='coerce')` and then drops rows with missing `reference_date` or `total_charges` (`df = df.dropna(...)`), but it never reports how many rows were removed. This can silently discard the non-ISO date format rows and any rows with non-parsable charges.",
+          "severity": "major"
+        },
+        {
+          "type": "E3",
+          "cell": 7,
+          "claim": "The model result is presented as a single fixed test performance in the conclusion.",
+          "evidence": "The train/test split has no `random_state`, and metrics vary across runs: AUC 0.734 vs 0.728 (Δ=0.006), Recall 0.110 vs 0.084 (Δ=0.026), Accuracy 0.859 vs 0.854 (Δ=0.005). Recall varies by > 0.02, so the result is not reproducible as written.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 2,
+        "C2": 2,
+        "C3": 3,
+        "C4": 4
+      },
+      "justifications": {
+        "C1": "The split and preprocessing are done correctly via a Pipeline/ColumnTransformer fit on X_tr only (cell 7), but Cleaning silently drops rows after coercing non-ISO dates/charges (cell 3) despite claiming “Everything is handled explicitly” (cell 2), which is a notable rigor gap given the role requirement.",
+        "C2": "Results are not fully reproducible because `train_test_split` has no `random_state` (cell 7) and verified execution shows material variation in Recall across runs (E3: 0.110 vs 0.084, Δ=0.026), even though the notebook otherwise executes without exceptions.",
+        "C3": "The conclusion claims “AUC 0.721” (cell 10) while the executed output shows AUC_TEST=0.734 (cell 8), a small but non-trivial mismatch; other cited conclusions (e.g., monthly contracts/complaints) are consistent with the coefficient ranking shown (cell 9).",
+        "C4": "Conclusions generally align with evidence (monthly contracts and complaints are among the strongest coefficients in cell 9), and the business direction is sensible; however, it omits key limitations like the very low recall at the chosen 0.5 threshold (cell 8) and the silent row-dropping in cleaning (cell 3), which weakens business-minded communication."
+      }
+    }
+  ]
+}

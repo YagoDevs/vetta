@@ -1,0 +1,13 @@
+{
+  "notebook": "nb01_ana_ferreira.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 5
+  },
+  "weighted_score": 5.0,
+  "decision": "AVANCAR",
+  "summary": "No concrete defects found under S1–S4/E1–E4. The split is stratified and occurs before any preprocessing; all transformations are inside a Pipeline/ColumnTransformer fit on train only. Metrics are appropriate for imbalance (AUC reported; recall discussed) and the narrative matches the executed outputs (AUC 0.729 is computed and cited). Notebook appears deterministic (fixed random_state) and runs end-to-end cleanly. Weighted score = 5.0 → Decision: ADVANCE."
+}

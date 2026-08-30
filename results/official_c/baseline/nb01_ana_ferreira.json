@@ -1,0 +1,13 @@
+{
+  "notebook": "nb01_ana_ferreira.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 5
+  },
+  "weighted_score": 5.0,
+  "decision": "AVANCAR",
+  "summary": "No detectable critical or non-critical defects under the provided taxonomy. The split is stratified and occurs before any fit/transform, with preprocessing inside a Pipeline (no leakage). Metrics used include ROC-AUC (appropriate for imbalance), and the narrative correctly cites the computed AUC (0.729) while acknowledging low recall at the default threshold and suggesting calibration. The notebook appears to run end-to-end with fixed seeds (train_test_split random_state=42; LogisticRegression random_state=42), and conclusions are supported by the coefficients output and evaluation results. Weighted score = 5.0 → Decision: ADVANCE."
+}

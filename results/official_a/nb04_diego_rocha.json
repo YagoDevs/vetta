@@ -1,0 +1,134 @@
+{
+  "notebook": "nb04_diego_rocha.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "Markdown says: “Stratified split BEFORE any transformation; preprocessing learns from the training set only.”",
+      "evidence": "In cell 7, the code scales numeric columns on the full dataset before the train/test split: `df[num] = StandardScaler().fit_transform(df[num])` happens before `train_test_split(...)`. This fits the scaler using both train and test data (data leakage).",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "Conclusion says: “The model achieves 0.853 accuracy, an excellent performance, getting the vast majority of customers right. The model is production-ready.”",
+      "evidence": "The dataset is imbalanced (cell 5 shows churn rate ≈ 0.157). With such imbalance, accuracy can look high even when the model misses most churners. The executed metrics (cell 8) show very low recall: RECALL_TEST=0.119 while ACC_TEST=0.853, so the narrative leans on a misleading metric for judging churn detection quality.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 5,
+    "C4": 2
+  },
+  "weighted_score": 3.2,
+  "decision": "REPROVAR",
+  "summary": "Overall quality is mixed: the notebook runs end-to-end and the reported test accuracy matches the computed output, but there is a major methodological flaw. The most important finding is data leakage: the scaler is fit on the full dataset before the train/test split, which contaminates the test set and makes results unreliable. In the interview, verify that the candidate understands proper ML pipelines (fit preprocessing only on the training set, e.g., via scikit-learn Pipeline/ColumnTransformer) and can explain why accuracy is misleading on imbalanced churn data, including how they would evaluate and improve recall/precision and choose decision thresholds.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      },
+      "safety_flags": []
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(remainder='passthrough',\n                                   transformers=[('c',\n                                                  OneHotEncoder(handle_unknown='ignore'),\n                                                  ['region', 'plan_type',\n                                                   'contract_type',\n                                                   'internet_tech'])])),\n                ('clf', LogisticRegression(max_iter=1000"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual      -0.41\nc__contract_type_monthly      0.41\nremainder__tenure_months     -0.39\nremainder__n_support_calls    0.34\nremainder__n_complaints       0.32\nremainder__total_charges     -0.28\nremainder__monthly_charges    0.25\nremainder__late_payment       0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S1",
+          "cell": 7,
+          "claim": "Markdown says: “Stratified split BEFORE any transformation; preprocessing learns from the training set only.”",
+          "evidence": "In cell 7, the code scales numeric columns on the full dataset before the train/test split: `df[num] = StandardScaler().fit_transform(df[num])` happens before `train_test_split(...)`. This fits the scaler using both train and test data (data leakage).",
+          "severity": "critical"
+        },
+        {
+          "type": "S3",
+          "cell": 10,
+          "claim": "Conclusion says: “The model achieves 0.853 accuracy, an excellent performance, getting the vast majority of customers right. The model is production-ready.”",
+          "evidence": "The dataset is imbalanced (cell 5 shows churn rate ≈ 0.157). With such imbalance, accuracy can look high even when the model misses most churners. The executed metrics (cell 8) show very low recall: RECALL_TEST=0.119 while ACC_TEST=0.853, so the narrative leans on a misleading metric for judging churn detection quality.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 1,
+        "C2": 5,
+        "C3": 5,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "Cell 7 fits `StandardScaler()` on the full dataframe before `train_test_split`, leaking test information into training (verified finding S1), which is a critical methodology failure per rubric.",
+        "C2": "All cells execute end-to-end without exceptions and key randomness is controlled via `random_state=42` in both `train_test_split` and `LogisticRegression` (cells 7–8), indicating stable, reproducible execution.",
+        "C3": "The only numeric claim in the text (“0.853 accuracy” in cell 10) matches the executed output `ACC_TEST=0.853` from cell 8, and no other metrics are misreported.",
+        "C4": "The conclusion overstates performance and “production-ready” based mainly on accuracy (cell 10) despite severe class imbalance (churn rate 0.157 in cell 5) and very low churn recall (0.119 in cell 8); this narrative issue is consistent with S3 and caps C4 at 2."
+      }
+    }
+  ]
+}

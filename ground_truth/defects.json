@@ -1,20 +1,20 @@
 {
   "dataset_note": "notebooks gerados por scripts/build_notebooks.py a partir do notebook ouro; defeitos registrados no momento da injecao",
   "notebooks": {
-    "nb01_strong": {
-      "description": "candidato forte — limpo",
+    "nb01_ana_ferreira": {
+      "description": "strong candidate — clean",
       "expected_decision": "AVANCAR",
       "defects": [],
       "real_auc_at_build": 0.729
     },
-    "nb02_honest": {
-      "description": "candidato mediano honesto — limpo",
+    "nb02_bruno_costa": {
+      "description": "honest mid-level candidate — clean",
       "expected_decision": "AVANCAR",
       "defects": [],
       "real_auc_at_build": 0.714
     },
-    "nb03_inflated": {
-      "description": "metrica inflada no texto",
+    "nb03_carla_mendes": {
+      "description": "inflated metric in the text",
       "expected_decision": "REPROVAR",
       "defects": [
         {
@@ -25,8 +25,8 @@
       ],
       "real_auc_at_build": 0.729
     },
-    "nb04_leak_acc": {
-      "description": "leakage de scaler + accuracy enganosa",
+    "nb04_diego_rocha": {
+      "description": "scaler leakage + misleading accuracy",
       "expected_decision": "REPROVAR",
       "defects": [
         {
@@ -42,14 +42,14 @@
       ],
       "real_auc_at_build": 0.729
     },
-    "nb05_broken": {
-      "description": "celula quebrada + conclusao orfa",
+    "nb05_elisa_martins": {
+      "description": "broken cell + orphan conclusion",
       "expected_decision": "REPROVAR",
       "defects": [
         {
           "type": "E2",
           "cell": 8,
-          "note": "usa variavel 'importancias' nunca definida — quebra em execucao limpa"
+          "note": "uses variable 'importances' never defined — breaks on a clean run"
         },
         {
           "type": "E4",
@@ -59,8 +59,8 @@
       ],
       "real_auc_at_build": 0.729
     },
-    "nb06_target": {
-      "description": "feature do target + metrica inflada",
+    "nb06_felipe_azevedo": {
+      "description": "target-derived feature + inflated claim",
       "expected_decision": "REPROVAR",
       "defects": [
         {
@@ -76,8 +76,8 @@
       ],
       "real_auc_at_build": 0.858
     },
-    "nb07_unstable": {
-      "description": "sem seed + perda silenciosa de dados",
+    "nb07_gabriela_lima": {
+      "description": "no seed + silent data loss",
       "expected_decision": "REVISAR",
       "defects": [
         {
@@ -91,10 +91,10 @@
           "note": "train_test_split e LogisticRegression sem random_state — metrica varia entre execucoes"
         }
       ],
-      "real_auc_at_build": 0.712
+      "real_auc_at_build": 0.721
     },
-    "nb08_multi": {
-      "description": "multiplos defeitos criticos",
+    "nb08_henrique_silva": {
+      "description": "multiple critical defects",
       "expected_decision": "REPROVAR",
       "defects": [
         {

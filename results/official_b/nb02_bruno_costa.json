@@ -1,0 +1,119 @@
+{
+  "notebook": "nb02_bruno_costa.ipynb",
+  "findings": [
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "In the conclusion, the narrative recommends prioritizing retention based on signals from the model, without noting that the classifier has very low recall at the default threshold used for predictions.",
+      "evidence": "Cell 8 shows RECALL_TEST=0.089 at the 0.5 threshold, meaning the model flags only ~9% of churners. While the conclusion mentions recall is low and suggests threshold calibration, the recommendation to prioritize specific segments is still presented without tying it to an evaluated operating point (e.g., calibrated threshold/precision-recall tradeoff) or demonstrating that the targeting strategy performs adequately despite the low recall.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 2
+  },
+  "weighted_score": 4.4,
+  "decision": "REVISAR",
+  "summary": "Overall the notebook is well-structured and technically sound: it uses a proper train/test split before any fitting, and scikit-learn Pipelines/ColumnTransformer to avoid data leakage, with stable results via fixed random seeds. The key issue is that the business recommendation is not well supported because the chosen 0.5 decision threshold yields very low recall (~0.09), so the model would miss most churners even though the AUC (~0.71) is reasonable. In the interview, ask the candidate to explain how they would select and validate an operating threshold (or use precision–recall curves/cost-based metrics), and how they would prove a retention targeting strategy adds value (e.g., lift by segment, expected ROI, or campaign simulation).",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        },
+        "b": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "shape after cleaning: (6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.714\nRECALL_TEST=0.089\nACC_TEST=0.845\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.45\nc__contract_type_monthly    0.44\nn__tenure_months           -0.39\nn__n_support_calls          0.37\nn__n_complaints             0.32\nn__total_charges           -0.30\nn__late_payment             0.25\nn__monthly_charges          0.23\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S3",
+          "cell": 10,
+          "claim": "In the conclusion, the narrative recommends prioritizing retention based on signals from the model, without noting that the classifier has very low recall at the default threshold used for predictions.",
+          "evidence": "Cell 8 shows RECALL_TEST=0.089 at the 0.5 threshold, meaning the model flags only ~9% of churners. While the conclusion mentions recall is low and suggests threshold calibration, the recommendation to prioritize specific segments is still presented without tying it to an evaluated operating point (e.g., calibrated threshold/precision-recall tradeoff) or demonstrating that the targeting strategy performs adequately despite the low recall.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 5,
+        "C3": 5,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "The notebook splits into train/test before fitting any preprocessing or model (cell 7) and uses a Pipeline+ColumnTransformer so scaling/encoding are learned on train only, avoiding leakage. It also acknowledges dataset messiness and converts comma decimals / normalizes categories (cells 2–3), and uses AUC (cell 8) which is appropriate for imbalance (churn rate ~0.157 in cell 5).",
+        "C2": "All cells execute end-to-end without exceptions, and the results are stable due to fixed random_state in both train_test_split and LogisticRegression (cell 7). Code is clean and uses sklearn Pipelines, reducing cell-order dependence.",
+        "C3": "The written headline result “AUC 0.714 on the test set” in the conclusion (cell 10) matches the executed output AUC_TEST=0.714 (cell 8), and the coefficient-based interpretation is directly supported by the printed top coefficients (cell 9). No claimed metrics diverge from the executed outputs provided.",
+        "C4": "Per verified finding S3, the recommendation to prioritize retention for certain segments is not tied to an evaluated operating point or campaign performance despite very low recall at the used 0.5 threshold (RECALL_TEST=0.089 in cell 8), so conclusions are insufficiently supported by the numbers. Although limitations mention low recall and threshold calibration (cell 10), the main business recommendation is still presented without demonstrating a workable precision/recall tradeoff or segment-level lift."
+      }
+    }
+  ]
+}

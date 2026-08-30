@@ -1,0 +1,21 @@
+{
+  "notebook": "nb02_bruno_costa.ipynb",
+  "findings": [
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "Narrative uses the model results for a retention recommendation without addressing that, at the chosen operating point (0.5 threshold), the classifier barely finds churners.",
+      "evidence": "Cell 8 shows RECALL_TEST=0.089 at the stated default threshold (pred = proba >= 0.5). With churn rate ~0.157 (cell 5), this indicates the model as used would miss ~91% of churners, so acting on “proactive retention” without an explicit threshold/cost calibration in the results risks being misleading if interpreted as a deployable classifier at 0.5. (They mention calibration as a limitation, but the only reported point-metrics include ACC=0.845, which can look strong on an imbalanced base.)",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 5,
+    "C4": 3
+  },
+  "weighted_score": 3.4,
+  "decision": "REPROVAR",
+  "summary": "Defects: S3 (critical) — reported accuracy (0.845) on an imbalanced base (churn 15.7%) alongside extremely low recall (0.089) can mislead; conclusions recommend proactive retention but the only evaluated operating point effectively fails to capture churners. Methodology otherwise is clean: split before preprocessing via a Pipeline/ColumnTransformer, fixed seeds, and claims match computed outputs (AUC 0.714). Scores: C1=1 due to misleading-metric risk; C2=5 (reproducible, no breakage); C3=5 (text matches outputs); C4=3 (reasonable and notes limitations, but recommendation is weakly supported given recall at evaluated threshold). Decision per rubric: REJECT because C1=1."
+}

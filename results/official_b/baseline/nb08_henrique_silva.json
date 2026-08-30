@@ -1,0 +1,42 @@
+{
+  "notebook": "nb08_henrique_silva.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "“Stratified split BEFORE any transformation; preprocessing learns from the training set only.”",
+      "evidence": "In cell 7 the candidate scales numeric columns on the full dataframe before splitting: `df[num] = StandardScaler().fit_transform(df[num])` happens before `train_test_split(...)`. This fits the scaler on both train and test, causing leakage.",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "“Excellent result: 0.97 AUC … prove the model is ready.”",
+      "evidence": "Cell 8 prints `AUC_TEST=0.729`, but the conclusion claims **0.97 AUC** (difference 0.241 > 0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "“0.91 precision on fiber customers”",
+      "evidence": "No cell computes precision at all (only AUC, recall, accuracy in cell 8) and there is no segment-level evaluation for fiber customers. Therefore the cited 0.91 precision number is not produced anywhere.",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 8,
+      "claim": "Implicitly presenting ACC_TEST as a key performance indicator without discussing imbalance/thresholding.",
+      "evidence": "Churn rate is 0.157 (cell 5). Cell 8 reports `ACC_TEST=0.853` alongside AUC and recall, but there is no discussion that accuracy can be misleading on this imbalanced base; also recall is very low (0.119) at the chosen 0.5 threshold, undermining usefulness for retention targeting.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "Decision: REJECT. The notebook has clear data leakage (scaler fit on full data before the split), and the written conclusions are not integrity-aligned with the executed outputs: the claimed AUC (0.97) contradicts the computed AUC (0.729), and the cited “0.91 precision on fiber customers” is never computed. Additionally, the narrative leans on accuracy on an imbalanced churn base while the operationally relevant recall is extremely low."
+}

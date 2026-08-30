@@ -1,0 +1,28 @@
+{
+  "notebook": "nb05_elisa_martins.ipynb",
+  "findings": [
+    {
+      "type": "E2",
+      "cell": 8,
+      "claim": "Per-segment analysis is executed.",
+      "evidence": "Cell 8 errors with `NameError: name 'importances' is not defined` due to `seg = importances.sort_values(...)` where `importances` was never created.",
+      "severity": "high"
+    },
+    {
+      "type": "E4",
+      "cell": 11,
+      "claim": "\"0.80 recall on the prepaid segment\"",
+      "evidence": "No cell computes recall by segment or anything referencing a \"prepaid\" segment. The only recall computed is overall test recall in cell 9: `RECALL_TEST=0.119`.",
+      "severity": "high"
+    }
+  ],
+  "scores": {
+    "C1": 4,
+    "C2": 1,
+    "C3": 1,
+    "C4": 2
+  },
+  "weighted_score": 2.1,
+  "decision": "REPROVAR",
+  "summary": "Defects: (1) the notebook does not run end-to-end due to a NameError in cell 8 (E2); (2) the conclusion cites a segment recall (0.80 on prepaid) that is not computed anywhere and contradicts the only computed recall (0.119) (E4). Methodology is mostly correct (proper stratified split and preprocessing inside a pipeline), but integrity and execution issues are critical, and conclusions are not supported by the produced results. Weighted score = 2.30 => Decision: REJECT."
+}

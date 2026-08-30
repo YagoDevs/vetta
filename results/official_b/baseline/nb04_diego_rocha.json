@@ -1,0 +1,28 @@
+{
+  "notebook": "nb04_diego_rocha.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "Markdown says: “Stratified split BEFORE any transformation; preprocessing learns from the training set only.”",
+      "evidence": "In cell 7 the candidate scales numeric columns on the full dataframe before the split: `df[num] = StandardScaler().fit_transform(df[num])` happens before `train_test_split(...)`, so the scaler is fit using test data (leakage).",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "“The model achieves 0.853 accuracy, an excellent performance, getting the vast majority of customers right.”",
+      "evidence": "Churn rate is 0.157 (cell 5), so predicting all zeros yields accuracy ≈ 0.843. Reported ACC_TEST=0.853 (cell 8) is only marginally above this baseline and recall is 0.119 (cell 8), indicating poor detection of churners. The narrative leans on accuracy despite class imbalance and contradicts the low recall.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 4,
+    "C4": 1
+  },
+  "weighted_score": 2.7,
+  "decision": "REPROVAR",
+  "summary": "Defects found: S1 (scaler fit on full data before split) and S3 (misleading reliance on accuracy on an imbalanced target; recall is very low and accuracy is near the naive baseline). Scores: C1=1 due to leakage and misleading metric usage; C2=5 as the notebook executes end-to-end with fixed seeds; C3=4 because cited accuracy matches the computed value, but interpretation is overstated; C4=1 because the conclusion (“excellent”, “production-ready”) is not supported by the observed metrics (especially recall). Decision per rubric: REJECT (any criterion = 1)."
+}

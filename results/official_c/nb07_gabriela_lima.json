@@ -1,0 +1,133 @@
+{
+  "notebook": "nb07_gabriela_lima.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 3,
+      "claim": "Markdown says: \"Everything is handled explicitly.\" (Cleaning)",
+      "evidence": "Cell 3 coerces non-ISO dates to NaT with `pd.to_datetime(..., format='%Y-%m-%d', errors='coerce')` and then drops rows via `df = df.dropna(subset=['reference_date', 'total_charges'])`, but it never reports how many rows are lost (no before/after shape or count). This can silently discard all rows with the second date format mentioned in the narrative.",
+      "severity": "major"
+    },
+    {
+      "type": "E3",
+      "cell": 10,
+      "claim": "Conclusion states: \"Model with AUC 0.721 on the test set.\"",
+      "evidence": "The train/test split has no `random_state`, and the AUC varies across runs: run_a AUC_TEST=0.711 vs run_b AUC_TEST=0.741 (spread 0.030 > 0.02). The claimed 0.721 lies within this observed range, so the result is not reproducible without a fixed seed.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 2,
+    "C2": 2,
+    "C3": 3,
+    "C4": 4
+  },
+  "weighted_score": 2.7,
+  "decision": "REVISAR",
+  "summary": "Overall, this notebook shows solid basic ML hygiene (stratified split and preprocessing kept inside a scikit-learn Pipeline), but there are two major issues that keep it in “review” status. The most important finding is that the data cleaning step converts non-matching date formats to missing values and then drops rows without reporting how many are removed, which could silently bias the dataset. Results are also not reproducible because the train/test split has no fixed random seed, and the reported test AUC changes noticeably between runs. In the interview, verify that she can (1) quantify and justify any row dropping/failed date parsing, (2) make evaluation reproducible (set seeds, use cross-validation), and (3) discuss threshold choice/recall trade-offs since the current 0.5 threshold yields very low recall.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.711,
+          "RECALL_TEST": 0.09,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.741,
+          "RECALL_TEST": 0.058,
+          "ACC_TEST": 0.85
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.711,
+          "RECALL_TEST": 0.09,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.741,
+          "RECALL_TEST": 0.058,
+          "ACC_TEST": 0.85
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "ok\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.153\ncontract_type\nannual     0.098\nmonthly    0.191\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.711\nRECALL_TEST=0.090\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.42\nc__contract_type_monthly    0.41\nn__n_support_calls          0.36\nn__n_complaints             0.34\nn__total_charges           -0.34\nn__tenure_months           -0.33\nn__late_payment             0.20\nn__monthly_charges          0.20\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S4",
+          "cell": 3,
+          "claim": "Markdown says: \"Everything is handled explicitly.\" (Cleaning)",
+          "evidence": "Cell 3 coerces non-ISO dates to NaT with `pd.to_datetime(..., format='%Y-%m-%d', errors='coerce')` and then drops rows via `df = df.dropna(subset=['reference_date', 'total_charges'])`, but it never reports how many rows are lost (no before/after shape or count). This can silently discard all rows with the second date format mentioned in the narrative.",
+          "severity": "major"
+        },
+        {
+          "type": "E3",
+          "cell": 10,
+          "claim": "Conclusion states: \"Model with AUC 0.721 on the test set.\"",
+          "evidence": "The train/test split has no `random_state`, and the AUC varies across runs: run_a AUC_TEST=0.711 vs run_b AUC_TEST=0.741 (spread 0.030 > 0.02). The claimed 0.721 lies within this observed range, so the result is not reproducible without a fixed seed.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 2,
+        "C2": 2,
+        "C3": 3,
+        "C4": 4
+      },
+      "justifications": {
+        "C1": "The split is stratified and the preprocessing is correctly inside a Pipeline/ColumnTransformer fit on X_tr only (cell 7), but the cleaning narrative overclaims: cell 3 coerces non-ISO dates to NaT and drops rows without quantifying impact, which is a major methodology slip per S4 (can silently remove the “second date format” mentioned).",
+        "C2": "Execution succeeds, but results are not stable/reproducible because train_test_split has no random_state (cell 7) and the verified finding E3 shows AUC varies materially between runs (0.711 vs 0.741). Per the rubric mapping, E3 caps C2 at 2.",
+        "C3": "The conclusion claims AUC 0.721 (cell 10) while the executed output in this run is AUC_TEST=0.711 (cell 8), a small divergence (0.010) that does not change the conclusion; however E3 confirms this number is also not reproducible due to the missing seed, so integrity is only partial rather than perfect.",
+        "C4": "Conclusions are broadly supported by the model coefficients (monthly contract positive, annual negative; complaints/support calls positive in cell 9) and the churn-rate EDA (cell 5), but the write-up does not acknowledge the very low recall at the chosen 0.5 threshold (cell 8) or the row-dropping risk from cleaning (cell 3), so communication is good but not fully actionable."
+      }
+    }
+  ]
+}

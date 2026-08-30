@@ -24,6 +24,7 @@ class ExecutionFacts:
     metrics_by_seed: dict[str, dict[str, float]]  # run "a"/"b" p/ detectar E3
     error_cells: list[int]
     duration_s: float
+    safety_flags: list[dict] = field(default_factory=list)
 
     def to_dict(self):
         return asdict(self)

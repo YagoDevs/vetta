@@ -1,0 +1,103 @@
+{
+  "notebook": "nb01_ana_ferreira.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 5
+  },
+  "weighted_score": 5.0,
+  "decision": "AVANCAR",
+  "summary": "Overall, the notebook is high quality: it runs end-to-end, uses reproducible settings, and applies good ML hygiene (notably avoiding data leakage by fitting preprocessing only on the training split). The most important finding is that while the model’s AUC is solid (0.729), its recall is very low (0.119), meaning it will miss many true churners even if its overall ranking is reasonable. In the interview, verify that the candidate can explain the trade-off between AUC and recall, and propose concrete steps to improve recall (e.g., threshold tuning, class weighting, alternative models) while managing false positives. Also confirm they understand when temporal validation is needed and how they would set it up for churn prediction.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.41\nc__contract_type_monthly    0.41\nn__tenure_months           -0.39\nn__n_support_calls          0.33\nn__n_complaints             0.32\nn__total_charges           -0.27\nn__monthly_charges          0.25\nn__late_payment             0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": []
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 5,
+        "C3": 5,
+        "C4": 5
+      },
+      "justifications": {
+        "C1": "Cell 7 performs a stratified train/test split before fitting any scaler/encoder, and all transforms are inside a Pipeline/ColumnTransformer fit only on X_tr, avoiding leakage; they also handle stated data messiness explicitly in cell 3 and use AUC (cell 8) which is appropriate for imbalance (churn rate 0.157 in cell 5).",
+        "C2": "Notebook executes end-to-end with no exceptions and stable, seeded behavior (random_state=42 in train_test_split and LogisticRegression in cell 7); outputs are produced as expected through modeling and coefficient inspection (cells 7–9).",
+        "C3": "The narrative claim “AUC 0.729 on the test set” in the conclusion (cell 10) exactly matches the executed output AUC_TEST=0.729 (cell 8), and the discussed low recall is consistent with RECALL_TEST=0.119 (cell 8).",
+        "C4": "Conclusions are supported by the evidence: main drivers cited match the largest-magnitude coefficients shown (cell 9), the recommendation targets the identified high-risk segment (monthly contracts + complaints), and limitations/next steps are explicitly grounded in the measured low recall and missing temporal validation (cell 10)."
+      }
+    }
+  ]
+}

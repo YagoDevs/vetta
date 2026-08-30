@@ -1,0 +1,154 @@
+{
+  "notebook": "nb06_felipe_azevedo.ipynb",
+  "findings": [
+    {
+      "type": "S2",
+      "cell": 6,
+      "claim": "The notebook introduces a \"composite risk feature\" intended as a predictive feature.",
+      "evidence": "Code builds risk_score using the target: df['risk_score'] = df['churned'] * df['n_complaints'] + df['late_payment']. This directly incorporates churned into X, leaking the label into features and invalidating evaluation.",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 11,
+      "claim": "\"With the new risk feature the model reaches AUC 0.99.\"",
+      "evidence": "The executed test metric printed in cell 9 is AUC_TEST=0.858 (both runs a and b). The absolute gap vs the claimed 0.99 is 0.132 (> 0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 7,
+      "claim": "\"Stratified split BEFORE any transformation; preprocessing learns from the training set only.\"",
+      "evidence": "Even though scaling/encoding are inside a Pipeline fit on X_tr, a feature derived from the full dataframe is created before splitting (cell 6) and it uses the target churned. The notebook never computes any check demonstrating transformations are learned from training only with respect to this engineered feature; instead, the feature itself encodes y.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 2
+  },
+  "weighted_score": 2.0,
+  "decision": "REPROVAR",
+  "summary": "Overall quality is below the bar: while the notebook runs end-to-end and uses standard scikit-learn pipelines correctly, the reported model performance cannot be trusted. The most important issue is a critical data leakage bug where a new feature (risk_score) is built using the target label (churned) before the train/test split, which effectively lets the model “see the answer” and invalidates the evaluation. There is also a major inconsistency between the written conclusion (AUC 0.99) and the actual printed test result (AUC 0.858), suggesting weak result tracking and verification. In the interview, ask the candidate to explain what data leakage is, identify why using the target in feature engineering breaks validation, and describe how they would structure feature engineering and reporting to keep train/test separation and metrics consistent.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.858,
+          "RECALL_TEST": 0.46,
+          "ACC_TEST": 0.913
+        },
+        "b": {
+          "AUC_TEST": 0.858,
+          "RECALL_TEST": 0.46,
+          "ACC_TEST": 0.913
+        }
+      },
+      "safety_flags": []
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.858,
+          "RECALL_TEST": 0.46,
+          "ACC_TEST": 0.913
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.858,
+          "RECALL_TEST": 0.46,
+          "ACC_TEST": 0.913
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 6,
+            "outputs": [
+              "count    6000.000000\nmean        0.224167\nstd         0.490873\nmin         0.000000\n25%         0.000000\n50%         0.000000\n75%         0.000000\nmax         4.000000\nName: risk_score, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['risk_score',\n                                                   'tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_call"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "AUC_TEST=0.858\nRECALL_TEST=0.460\nACC_TEST=0.913\n"
+            ]
+          },
+          {
+            "cell": 10,
+            "outputs": [
+              "n__risk_score               4.54\nn__late_payment            -3.11\nn__n_complaints            -1.79\nc__contract_type_annual    -0.47\nc__contract_type_monthly    0.46\nn__tenure_months           -0.38\nn__n_support_calls          0.35\nn__monthly_charges          0.22\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S2",
+          "cell": 6,
+          "claim": "The notebook introduces a \"composite risk feature\" intended as a predictive feature.",
+          "evidence": "Code builds risk_score using the target: df['risk_score'] = df['churned'] * df['n_complaints'] + df['late_payment']. This directly incorporates churned into X, leaking the label into features and invalidating evaluation.",
+          "severity": "critical"
+        },
+        {
+          "type": "E1",
+          "cell": 11,
+          "claim": "\"With the new risk feature the model reaches AUC 0.99.\"",
+          "evidence": "The executed test metric printed in cell 9 is AUC_TEST=0.858 (both runs a and b). The absolute gap vs the claimed 0.99 is 0.132 (> 0.05).",
+          "severity": "critical"
+        },
+        {
+          "type": "E4",
+          "cell": 7,
+          "claim": "\"Stratified split BEFORE any transformation; preprocessing learns from the training set only.\"",
+          "evidence": "Even though scaling/encoding are inside a Pipeline fit on X_tr, a feature derived from the full dataframe is created before splitting (cell 6) and it uses the target churned. The notebook never computes any check demonstrating transformations are learned from training only with respect to this engineered feature; instead, the feature itself encodes y.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 1,
+        "C2": 5,
+        "C3": 1,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "Critical leakage: cell 6 creates risk_score using the target (df['risk_score'] = df['churned'] * df['n_complaints'] + ...), and this leaked feature is then used in X (cell 8), invalidating the train/test evaluation (S2 => C1=1).",
+        "C2": "The notebook executes end-to-end without exceptions (cells 1–10), producing stable printed metrics (AUC/recall/accuracy in cell 9) and readable sklearn Pipeline/ColumnTransformer usage.",
+        "C3": "The written conclusion claims AUC 0.99 (cell 11), but the executed output shows AUC_TEST=0.858 (cell 9), a >0.05 divergence (E1 critical => C3=1).",
+        "C4": "Narrative claims proper methodology (“split BEFORE any transformation… training set only”, cell 7), but the engineered feature is created pre-split and encodes y (cell 6), so the conclusions about feature engineering impact are not supported (E4 => C4<=2)."
+      }
+    }
+  ]
+}

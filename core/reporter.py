@@ -7,20 +7,24 @@ import json
 
 from core.models import ExecutionFacts, Finding, Verdict, decide, weighted_score
 
-SYSTEM = """Voce redige o resumo executivo de uma avaliacao tecnica para uma recrutadora
-(conhecimento tecnico medio). 3-5 frases, portugues claro, sem jargao gratuito.
-Diga: qualidade geral, o achado mais importante (se houver) em termos que ela entenda,
-e o que verificar na entrevista. Tom factual — nem vendedor, nem alarmista.
-Responda APENAS JSON: {"summary": "..."}"""
+SYSTEM = """You write the executive summary of a technical evaluation for a recruiter
+(medium technical knowledge). 3-5 sentences, clear English, no gratuitous jargon.
+Say: overall quality, the most important finding (if any) in terms she will understand,
+and what to verify in the interview. If role_requirements are present, say in one
+sentence how well the candidate appears to meet what the role asks. Factual tone —
+neither salesy nor alarmist.
+Respond with JSON ONLY: {"summary": "..."}"""
 
 
 def report(llm, facts: ExecutionFacts, findings: list[Finding],
-           scores: dict, justs: dict, trajectory: list[dict]) -> Verdict:
+           scores: dict, justs: dict, trajectory: list[dict],
+           requirements: str = '') -> Verdict:
     decision = decide(scores, findings)
     user = json.dumps(
-        {"notebook": facts.notebook, "decisao": decision, "scores": scores,
-         "justificativas": justs,
-         "findings": [f.to_dict() for f in findings]},
+        {"notebook": facts.notebook, "decision": decision, "scores": scores,
+         "justifications": justs,
+         "findings": [f.to_dict() for f in findings],
+         "role_requirements": requirements or "not provided"},
         ensure_ascii=False)
     resp = llm.complete(SYSTEM, user, tag=f"report_{facts.notebook}")
     return Verdict(

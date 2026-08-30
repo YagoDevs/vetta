@@ -1,51 +1,50 @@
-# Rubrica de Avaliação — Case de Data Science (Churn)
+# Scoring Rubric — Data Science Case (Churn)
 
-> **Pré-registro**: esta rubrica foi escrita ANTES da primeira execução oficial dos
-> agentes e da baseline (ver histórico do git). Ela é dada, idêntica, ao agente
-> avaliador e à baseline.
+> **Pre-registration**: this rubric was written BEFORE the first official run of the
+> agents and the baseline (see git history; originally authored in Portuguese and
+> translated verbatim, same criteria and thresholds). It is given, identically, to the
+> assessor agent and to the baseline.
 
-Cada notebook recebe nota 1-5 em quatro critérios. A decisão sugerida deriva
-das regras ao final — nunca de "impressão geral".
+Each notebook receives a 1-5 score on four criteria. The suggested decision derives
+from the rules at the end — never from "overall impression".
 
-## C1 — Metodologia (peso 30%)
-Split treino/teste correto e feito ANTES de qualquer fit/transform; validação
-adequada (holdout ou CV); métrica apropriada para classe desbalanceada;
-tratamento consciente dos dados sujos (datas mistas, decimais com vírgula,
-categorias inconsistentes).
+## C1 — Methodology (weight 30%)
+Train/test split done correctly and BEFORE any fit/transform; adequate validation
+(holdout or CV); appropriate metric for an imbalanced class; conscious handling of
+the messy data (mixed date formats, comma decimals, inconsistent categories).
 
-- **5**: split antes de tudo, sem vazamento; métrica justificada; sujeira tratada e documentada.
-- **3**: metodologia essencialmente correta com descuidos menores (ex.: não estratificou).
-- **1**: vazamento de dados (fit antes do split, target em feature, scaler no dataset inteiro) OU métrica enganosa (accuracy em base 95/5 sem discussão).
+- **5**: split before everything, no leakage; metric justified; messiness handled and documented.
+- **3**: essentially correct methodology with minor slips (e.g. did not stratify).
+- **1**: data leakage (fit before split, target in a feature, scaler on the full dataset) OR a misleading metric (accuracy on a 95/5 base with no discussion).
 
-## C2 — Qualidade de código e execução (peso 20%)
-O notebook executa de ponta a ponta, em ordem, com resultados estáveis.
+## C2 — Code quality and execution (weight 20%)
+The notebook runs end to end, in order, with stable results.
 
-- **5**: executa limpo; seeds fixadas; código legível.
-- **3**: executa com warnings ou dependência de ordem de células; alguma repetição.
-- **1**: célula lança exceção OU resultado muda materialmente entre execuções (seed não fixada com variação > 0.05 na métrica principal).
+- **5**: runs clean; seeds fixed; readable code.
+- **3**: runs with warnings or cell-order dependence; some repetition.
+- **1**: a cell raises an exception OR the result changes materially between runs (unfixed seed with > 0.05 variation on the main metric).
 
-## C3 — Integridade dos resultados (peso 30%)
-O que o candidato ESCREVE corresponde ao que o código PRODUZ.
+## C3 — Integrity of results (weight 30%)
+What the candidate WRITES matches what the code PRODUCES.
 
-- **5**: toda métrica citada no texto bate com o output executado (tolerância ±0.01).
-- **3**: divergências pequenas (arredondamento, célula desatualizada) que não mudam a conclusão.
-- **1**: métrica declarada diverge da real em >0.05 OU conclusão cita resultado que nenhuma célula produz.
+- **5**: every metric cited in the text matches the executed output (±0.01 tolerance).
+- **3**: small divergences (rounding, stale cell) that do not change the conclusion.
+- **1**: claimed metric diverges from the real one by >0.05 OR a conclusion cites a result no cell produces.
 
-## C4 — Conclusões e comunicação (peso 20%)
-As conclusões são suportadas pelos números e respondem à pergunta de negócio.
+## C4 — Conclusions and communication (weight 20%)
+The conclusions are supported by the numbers and answer the business question.
 
-- **5**: conclusões amarradas às evidências; limitações reconhecidas; recomendação acionável.
-- **3**: conclusões razoáveis mas genéricas; pouca conexão com os números.
-- **1**: conclusões contradizem os próprios resultados ou ignoram falha grave.
+- **5**: conclusions tied to evidence; limitations acknowledged; actionable recommendation.
+- **3**: reasonable but generic conclusions; weak connection to the numbers.
+- **1**: conclusions contradict the candidate's own results or ignore a serious failure.
 
-## Regras de decisão (determinísticas)
-- **REPROVAR**: qualquer critério = 1 (defeito crítico), OU score ponderado < 2.5.
-- **REVISAR**: score ponderado 2.5-3.4, OU divergência C3 não-crítica, OU só executável com correção trivial.
-- **AVANÇAR**: score ponderado ≥ 3.5 e nenhum critério ≤ 2.
+## Decision rules (deterministic)
+- **REJECT (REPROVAR)**: any criterion = 1 (critical defect), OR weighted score < 2.5.
+- **REVIEW (REVISAR)**: weighted score 2.5-3.4, OR non-critical C3 divergence, OR only an executable defect with a trivial fix.
+- **ADVANCE (AVANCAR)**: weighted score ≥ 3.5 and no criterion ≤ 2.
 
-Score ponderado = 0.30·C1 + 0.20·C2 + 0.30·C3 + 0.20·C4.
+Weighted score = 0.30·C1 + 0.20·C2 + 0.30·C3 + 0.20·C4.
 
-## O que o avaliador NÃO julga
-Estilo pessoal, escolha de biblioteca, se usou IA para escrever código
-(assume-se que sim, como em 2026 é norma) — apenas julgamento, correção e
-integridade.
+## What the assessor does NOT judge
+Personal style, library choice, whether AI was used to write code (assumed yes, as is
+the norm in 2026) — only judgment, correctness and integrity.

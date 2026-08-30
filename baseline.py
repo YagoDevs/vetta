@@ -21,27 +21,27 @@ from core.models import Finding, decide, weighted_score
 ROOT = Path(__file__).resolve().parent
 RUBRIC = (ROOT / "ground_truth" / "RUBRIC.md").read_text()
 
-SYSTEM = f"""Voce e um avaliador senior de cases de data science em processos seletivos.
-Avalie o notebook entregue pelo candidato (fornecido COM os outputs executados).
+SYSTEM = f"""You are a senior assessor of data science cases in hiring processes.
+Evaluate the notebook the candidate delivered (provided WITH its executed outputs).
 
-Tipos de defeito (use exatamente estes codigos):
-- S1: fit/transform de preprocessador antes do split (leakage)
-- S2: feature construida a partir do proprio target
-- S3: a narrativa se apoia em metrica enganosa (ex.: accuracy em base desbalanceada)
-- S4: perda silenciosa de dados (parse/filtro descarta fatia relevante sem reportar)
-- E1: metrica declarada no texto diverge da real (gap > 0.05)
-- E2: celula quebraria em execucao limpa
-- E3: resultado depende de seed nao fixada
-- E4: conclusao cita numero que nenhuma celula computa
+Defect types (use exactly these codes):
+- S1: preprocessor fit/transform before the split (leakage)
+- S2: feature built from the target itself
+- S3: the narrative leans on a misleading metric (e.g. accuracy on an imbalanced base)
+- S4: silent data loss (a parse/filter discards a relevant share of rows without reporting)
+- E1: metric claimed in the text diverges from the real one (gap > 0.05)
+- E2: a cell would break on a clean run
+- E3: the result depends on an unfixed seed
+- E4: a conclusion cites a number no cell computes
 
-So reporte defeito com evidencia concreta; na duvida, nao reporte.
+Only report a defect with concrete evidence; when in doubt, do not report.
 
-Pontue tambem os criterios C1-C4 da rubrica abaixo (inteiros 1-5).
+Also score criteria C1-C4 of the rubric below (integers 1-5).
 
-RUBRICA:
+RUBRIC:
 {RUBRIC}
 
-Responda APENAS JSON:
+Respond with JSON ONLY, in clear English:
 {{"findings": [{{"type","cell","claim","evidence","severity"}}],
   "scores": {{"C1": n, "C2": n, "C3": n, "C4": n}},
   "summary": "..."}}
@@ -77,7 +77,7 @@ def main():
     llm = make_client(args.mode, run_dir)
     for path in sorted(args.notebooks.glob("*.ipynb")):
         t0 = time.time()
-        user = json.dumps({"notebook_entregue": notebook_as_delivered(path)}, ensure_ascii=False)
+        user = json.dumps({"notebook_as_delivered": notebook_as_delivered(path)}, ensure_ascii=False)
         resp = llm.complete(SYSTEM, user, tag=f"baseline_{path.name}")
         findings = [Finding(f.get("type", "?"), int(f.get("cell", -1)),
                             str(f.get("claim", "")), str(f.get("evidence", "")),

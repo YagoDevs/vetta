@@ -1,0 +1,147 @@
+{
+  "notebook": "nb08_henrique_silva.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "The notebook claims: “Stratified split BEFORE any transformation; preprocessing learns from the training set only.”",
+      "evidence": "In cell 7, scaling is fit on the full dataset before the split: `df[num] = StandardScaler().fit_transform(df[num])` happens prior to `train_test_split(...)`. This leaks test-set distribution information into training features.",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "Conclusion claims an “Excellent result: 0.97 AUC”.",
+      "evidence": "Cell 8 prints `AUC_TEST=0.729` (also reflected in printed_metrics_run_a/b = 0.729). The absolute gap vs 0.97 is 0.241 (> 0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "Conclusion claims “0.91 precision on fiber customers”.",
+      "evidence": "No cell computes precision at all (only AUC, recall, accuracy are printed in cell 8), and there is no segment-specific evaluation for fiber customers. Therefore the cited 0.91 precision is not produced anywhere in the notebook outputs.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 2
+  },
+  "weighted_score": 2.0,
+  "decision": "REPROVAR",
+  "summary": "Overall notebook quality is weak despite running end-to-end, because there are critical methodological and reporting issues. The most important finding is data leakage: the scaling is fit on the full dataset before the train/test split, which can inflate performance and undermines the validity of the evaluation. The written conclusions also do not match the executed results (it claims 0.97 AUC and 0.91 precision, while the notebook output shows AUC 0.729 and no precision/segment analysis), raising a serious integrity concern. In the interview, ask the candidate to explain how to prevent leakage using a proper train-only preprocessing pipeline (e.g., sklearn Pipeline) and to reconcile their narrative with the actual printed metrics, including how they would compute precision and any segment-specific performance before recommending deployment.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(remainder='passthrough',\n                                   transformers=[('c',\n                                                  OneHotEncoder(handle_unknown='ignore'),\n                                                  ['region', 'plan_type',\n                                                   'contract_type',\n                                                   'internet_tech'])])),\n                ('clf', LogisticRegression(max_iter=1000"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual      -0.41\nc__contract_type_monthly      0.41\nremainder__tenure_months     -0.39\nremainder__n_support_calls    0.34\nremainder__n_complaints       0.32\nremainder__total_charges     -0.28\nremainder__monthly_charges    0.25\nremainder__late_payment       0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S1",
+          "cell": 7,
+          "claim": "The notebook claims: “Stratified split BEFORE any transformation; preprocessing learns from the training set only.”",
+          "evidence": "In cell 7, scaling is fit on the full dataset before the split: `df[num] = StandardScaler().fit_transform(df[num])` happens prior to `train_test_split(...)`. This leaks test-set distribution information into training features.",
+          "severity": "critical"
+        },
+        {
+          "type": "E1",
+          "cell": 10,
+          "claim": "Conclusion claims an “Excellent result: 0.97 AUC”.",
+          "evidence": "Cell 8 prints `AUC_TEST=0.729` (also reflected in printed_metrics_run_a/b = 0.729). The absolute gap vs 0.97 is 0.241 (> 0.05).",
+          "severity": "critical"
+        },
+        {
+          "type": "E4",
+          "cell": 10,
+          "claim": "Conclusion claims “0.91 precision on fiber customers”.",
+          "evidence": "No cell computes precision at all (only AUC, recall, accuracy are printed in cell 8), and there is no segment-specific evaluation for fiber customers. Therefore the cited 0.91 precision is not produced anywhere in the notebook outputs.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 1,
+        "C2": 5,
+        "C3": 1,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "Cell 7 fits `StandardScaler()` on the full dataset before `train_test_split`, contradicting the stated “split BEFORE any transformation” and causing leakage (verified finding S1, critical). Aside from that, the split is stratified and AUC is computed (cell 8), but leakage forces a score of 1 per rubric mapping.",
+        "C2": "The notebook executes end-to-end without exceptions: data loads (cell 1), cleaning completes with 0 missing values (cell 3), model fits (cell 7), and metrics print successfully (cell 8). Random states are set for the split and model (cell 7), supporting stable execution.",
+        "C3": "The written result “0.97 AUC” in the conclusion (cell 10) does not match the executed output `AUC_TEST=0.729` (cell 8), a >0.05 divergence (verified finding E1, critical). The conclusion also cites “0.91 precision on fiber customers” with no corresponding computation anywhere (verified finding E4, major), so integrity is critically broken.",
+        "C4": "The conclusion claims immediate deployment based on “0.97 AUC” and “0.91 precision on fiber customers” (cell 10), but the actual reported metrics are AUC 0.729 and recall 0.119 (cell 8), and precision-by-segment isn’t computed (E4). Because the narrative is not supported by the notebook’s own numbers, communication/actionability is weak and capped (E4 => C4<=2)."
+      }
+    }
+  ]
+}

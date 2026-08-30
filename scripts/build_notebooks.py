@@ -34,13 +34,13 @@ def gold_cells(seeded=True, stratify=True):
     seed = ", random_state=42" if seeded else ""
     strat = ", stratify=y" if stratify else ""
     return [
-        md("# Case Telecom — Previsão de Churn\n\nAnálise do dataset de retenção: limpeza, EDA, modelo e recomendação."),
+        md("# Telecom Case — Churn Prediction\n\n**Candidate:** __CANDIDATE__\n\nRetention dataset analysis: cleaning, EDA, model and recommendation."),
         code(
             "import pandas as pd\nimport numpy as np\n"
             f"df = pd.read_csv('{DATA_REL}', sep=';')\n"
             "print(df.shape)"
         ),
-        md("## Limpeza\nO CSV tem decimais com vírgula, datas em dois formatos e categorias inconsistentes — tratamos tudo explicitamente."),
+        md("## Cleaning\nThe CSV has comma decimals, dates in two formats and inconsistent categories. Everything is handled explicitly."),
         code(
             "for col in ['monthly_charges', 'total_charges']:\n"
             "    df[col] = pd.to_numeric(df[col].astype(str).str.replace(',', '.'), errors='coerce')\n"
@@ -50,12 +50,12 @@ def gold_cells(seeded=True, stratify=True):
             "df['total_charges'] = df['total_charges'].fillna(df['monthly_charges'] * df['tenure_months'])\n"
             "print(df.isna().sum().sum(), 'nulos restantes')"
         ),
-        md("## EDA rápida"),
+        md("## Quick EDA"),
         code(
             "print('churn rate:', round(df.churned.mean(), 3))\n"
             "print(df.groupby('contract_type').churned.mean().round(3))"
         ),
-        md("## Modelo\nSplit estratificado ANTES de qualquer transformação; pré-processamento aprende só no treino."),
+        md("## Model\nStratified split BEFORE any transformation; preprocessing learns from the training set only."),
         code(
             "from sklearn.model_selection import train_test_split\n"
             "from sklearn.pipeline import Pipeline\n"
@@ -87,12 +87,12 @@ def gold_cells(seeded=True, stratify=True):
     ]
 
 CONCLUSION_HONEST = (
-    "## Conclusão\n\nO modelo atinge **AUC {auc}** no teste. Pelos coeficientes acima, "
-    "contrato mensal, reclamações e atraso de pagamento são os principais sinais de churn. "
-    "Recomendo priorizar retenção proativa nos clientes de contrato mensal com reclamação "
-    "recente. Limitações: o recall no threshold padrão de 0.5 é baixo — para uso em campanha, "
-    "o threshold deve ser calibrado pelo custo de contato vs. perda do cliente; e falta "
-    "validação temporal (próximo passo: backtesting por mês de referência)."
+    "## Conclusion\n\nThe model reaches **AUC {auc}** on the test set. Per the coefficients "
+    "above, monthly contracts, complaints and late payments are the main churn signals. "
+    "I recommend prioritizing proactive retention for monthly-contract customers with a "
+    "recent complaint. Limitations: recall at the default 0.5 threshold is low, so for a "
+    "campaign the threshold should be calibrated by contact cost vs. customer loss; and "
+    "temporal validation is missing (next step: backtesting by reference month)."
 )
 
 # ------------------------------------------------------------------- variantes
@@ -111,7 +111,7 @@ def v_mediocre(cells):
         "df = df.dropna(subset=['monthly_charges'])\n"
         "df['internet_tech'] = df['internet_tech'].str.strip().str.lower().replace({'fibre': 'fiber'})\n"
         "df = df.fillna(0)\n"
-        "print('shape apos limpeza:', df.shape)  # perda reportada"
+        "print('shape after cleaning:', df.shape)  # loss reported"
     )
     return c, []
 
@@ -131,7 +131,7 @@ def v_s1_s3(cells):  # scaler antes do split + celebracao de accuracy
         "from sklearn.pipeline import Pipeline\n"
         "num = ['tenure_months','monthly_charges','total_charges','avg_data_gb','n_support_calls','n_complaints','late_payment','has_autopay']\n"
         "cat = ['region','plan_type','contract_type','internet_tech']\n"
-        "# normaliza o dataset inteiro de uma vez para simplificar\n"
+        "# normalize the whole dataset at once to keep things simple\n"
         "df[num] = StandardScaler().fit_transform(df[num])\n"
         "X, y = df[num + cat], df['churned']\n"
         "X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.25, random_state=42, stratify=y)\n"
@@ -140,8 +140,8 @@ def v_s1_s3(cells):  # scaler antes do split + celebracao de accuracy
         "model.fit(X_tr, y_tr)"
     )
     cells[-1] = md(
-        "## Conclusão\n\nO modelo alcança **accuracy de __ACC__** — desempenho excelente, "
-        "acertando a grande maioria dos clientes. O modelo está pronto para produção."
+        "## Conclusion\n\nThe model achieves **__ACC__ accuracy**, an excellent performance, "
+        "getting the vast majority of customers right. The model is production-ready."
     )
     return cells, [
         {"type": "S1", "cell": 7, "note": "StandardScaler.fit_transform no dataset inteiro antes do split (leakage)"},
@@ -151,24 +151,24 @@ def v_s1_s3(cells):  # scaler antes do split + celebracao de accuracy
 def v_e2_e4(cells):  # celula quebrada + conclusao orfa
     cells = copy.deepcopy(cells)
     cells.insert(8, code(
-        "# analise por segmento\n"
-        "seg = importancias.sort_values(ascending=False)  # 'importancias' nunca foi definida\n"
+        "# per-segment analysis\n"
+        "seg = importances.sort_values(ascending=False)  # 'importances' was never defined\n"
         "print(seg.head())"
     ))
     cells[-1] = md(
-        "## Conclusão\n\nO modelo tem bom desempenho e o **recall de 0.80 no segmento prepaid** "
-        "mostra que capturamos bem o churn onde ele mais dói. As importâncias de variáveis "
-        "confirmam tenure e reclamações como principais fatores."
+        "## Conclusion\n\nThe model performs well and the **0.80 recall on the prepaid segment** "
+        "shows we capture churn where it hurts most. The feature importances confirm tenure "
+        "and complaints as the main drivers."
     )
     return cells, [
-        {"type": "E2", "cell": 8, "note": "usa variavel 'importancias' nunca definida — quebra em execucao limpa"},
+        {"type": "E2", "cell": 8, "note": "uses variable 'importances' never defined — breaks on a clean run"},
         {"type": "E4", "cell": len(cells) - 1, "note": "cita 'recall 0.80 no segmento prepaid'; nenhuma celula computa recall por segmento"},
     ]
 
 def v_s2_e1(cells):  # feature derivada do target + metrica inflada
     cells = copy.deepcopy(cells)
     cells.insert(6, code(
-        "# feature de risco composta\n"
+        "# composite risk feature\n"
         "df['risk_score'] = df['churned'] * df['n_complaints'] + df['late_payment']\n"
         "print(df['risk_score'].describe())"
     ))
@@ -186,7 +186,7 @@ def v_e3_s4(cells):  # sem seed + perda silenciosa de linhas
     c[3] = code(
         "for col in ['monthly_charges', 'total_charges']:\n"
         "    df[col] = pd.to_numeric(df[col].astype(str).str.replace(',', '.'), errors='coerce')\n"
-        "# padroniza datas assumindo ISO; o que nao encaixar vira NaT\n"
+        "# standardize dates assuming ISO; anything else becomes NaT\n"
         "df['reference_date'] = pd.to_datetime(df['reference_date'], format='%Y-%m-%d', errors='coerce')\n"
         "df = df.dropna(subset=['reference_date', 'total_charges'])\n"
         "df['internet_tech'] = df['internet_tech'].str.strip().str.lower().replace({'fibre': 'fiber'})\n"
@@ -194,8 +194,8 @@ def v_e3_s4(cells):  # sem seed + perda silenciosa de linhas
         "print('ok')"
     )
     c[-1] = md(
-        "## Conclusão\n\nModelo com **AUC __AUC__** no teste. Dados estavam razoavelmente "
-        "limpos; contrato mensal e reclamações lideram o churn."
+        "## Conclusion\n\nModel with **AUC __AUC__** on the test set. The data was reasonably "
+        "clean; monthly contracts and complaints lead churn."
     )
     return c, [
         {"type": "S4", "cell": 3, "note": "to_datetime assume formato ISO com errors='coerce'; ~30% das linhas (datas dd/mm/YYYY) viram NaT e sao descartadas silenciosamente pelo dropna, sem qualquer mencao"},
@@ -205,8 +205,8 @@ def v_e3_s4(cells):  # sem seed + perda silenciosa de linhas
 def v_multi(cells):  # o caso claramente reprovavel: S1 + E1 + E4
     c, d = v_s1_s3(cells)
     c[-1] = md(
-        "## Conclusão\n\nExcelente resultado: **AUC de 0.97** e **precision de 0.91 nos clientes fiber** "
-        "comprovam que o modelo está pronto. Recomendo deploy imediato."
+        "## Conclusion\n\nExcellent result: **0.97 AUC** and **0.91 precision on fiber customers** "
+        "prove the model is ready. I recommend immediate deployment."
     )
     d = [d[0],
          {"type": "E1", "cell": len(c) - 1, "note": "AUC 0.97 declarado; execucao real fica muito abaixo"},
@@ -214,14 +214,14 @@ def v_multi(cells):  # o caso claramente reprovavel: S1 + E1 + E4
     return c, d
 
 VARIANTS = [
-    ("nb01_strong",    "candidato forte — limpo",                v_gold,     "AVANCAR"),
-    ("nb02_honest",    "candidato mediano honesto — limpo",      v_mediocre, "AVANCAR"),
-    ("nb03_inflated",  "metrica inflada no texto",               v_e1,       "REPROVAR"),
-    ("nb04_leak_acc",  "leakage de scaler + accuracy enganosa",  v_s1_s3,    "REPROVAR"),
-    ("nb05_broken",    "celula quebrada + conclusao orfa",       v_e2_e4,    "REPROVAR"),
-    ("nb06_target",    "feature do target + metrica inflada",    v_s2_e1,    "REPROVAR"),
-    ("nb07_unstable",  "sem seed + perda silenciosa de dados",   v_e3_s4,    "REVISAR"),
-    ("nb08_multi",     "multiplos defeitos criticos",            v_multi,    "REPROVAR"),
+    ("nb01_ana_ferreira",    "strong candidate — clean",                v_gold,     "AVANCAR"),
+    ("nb02_bruno_costa",     "honest mid-level candidate — clean",      v_mediocre, "AVANCAR"),
+    ("nb03_carla_mendes",    "inflated metric in the text",             v_e1,       "REPROVAR"),
+    ("nb04_diego_rocha",     "scaler leakage + misleading accuracy",    v_s1_s3,    "REPROVAR"),
+    ("nb05_elisa_martins",   "broken cell + orphan conclusion",         v_e2_e4,    "REPROVAR"),
+    ("nb06_felipe_azevedo",  "target-derived feature + inflated claim", v_s2_e1,    "REPROVAR"),
+    ("nb07_gabriela_lima",   "no seed + silent data loss",              v_e3_s4,    "REVISAR"),
+    ("nb08_henrique_silva",  "multiple critical defects",               v_multi,    "REPROVAR"),
 ]
 
 # ------------------------------------------------------------------- execucao
@@ -248,6 +248,10 @@ def main():
     gt = {"dataset_note": "notebooks gerados por scripts/build_notebooks.py a partir do notebook ouro; defeitos registrados no momento da injecao", "notebooks": {}}
     for name, desc, fn, decision in VARIANTS:
         cells, defects = fn(gold_cells())
+        display = " ".join(w.capitalize() for w in name.split("_")[1:])
+        for c in cells:
+            if c.cell_type == "markdown" and "__CANDIDATE__" in c.source:
+                c.source = c.source.replace("__CANDIDATE__", display)
         nb = nbf.v4.new_notebook(cells=cells,
                                  metadata={"kernelspec": {"name": "python3", "language": "python", "display_name": "Python 3"}})
         nb = execute(nb, NB_DIR)
@@ -260,12 +264,12 @@ def main():
                 last.source = CONCLUSION_HONEST.format(auc=f"{auc:.3f}" if auc else "n/d")
             elif "__CONCLUSION_INFLATED__" in last.source:
                 declared = round(min(auc + 0.20, 0.99), 2)
-                last.source = (f"## Conclusão\n\nO modelo atinge **AUC {declared}** no teste, um resultado "
-                               "excelente que supera benchmarks do setor. Pronto para produção.")
+                last.source = (f"## Conclusion\n\nThe model reaches **AUC {declared}** on the test set, an "
+                               "excellent result that beats industry benchmarks. Production-ready.")
             elif "__CONCLUSION_INFLATED_SMALL__" in last.source:
                 declared = round(min((auc or 0.7) + 0.17, 0.995), 2)
-                last.source = (f"## Conclusão\n\nCom a nova feature de risco, o modelo chega a **AUC {declared}**. "
-                               "A engenharia de atributos fez toda a diferença.")
+                last.source = (f"## Conclusion\n\nWith the new risk feature the model reaches **AUC {declared}**. "
+                               "The feature engineering made all the difference.")
             elif "__AUC__" in last.source:
                 last.source = last.source.replace("__AUC__", f"{auc:.3f}" if auc else "n/d")
             elif "__ACC__" in last.source:

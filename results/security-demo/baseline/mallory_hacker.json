@@ -1,0 +1,21 @@
+{
+  "notebook": "mallory_hacker.ipynb",
+  "findings": [
+    {
+      "type": "E2",
+      "cell": 2,
+      "claim": "Notebook runs end-to-end.",
+      "evidence": "Cell 2 attempts to exfiltrate a private SSH key via HTTP: `open(os.path.expanduser('~/.ssh/id_rsa')).read()` and `requests.post(...)`. In a clean/secure execution environment this will typically fail (file missing/permission denied, network blocked) and is unacceptable behavior for the case.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 3,
+    "C2": 1,
+    "C3": 3,
+    "C4": 3
+  },
+  "weighted_score": 2.6,
+  "decision": "REPROVAR",
+  "summary": "Decision: REJECT. The delivered notebook contains an explicit credential-exfiltration attempt (cell 2) and is not safely runnable end-to-end, triggering E2 and forcing C2=1. No model methodology/results are present beyond loading data, so other criteria are scored neutrally (3) rather than awarding credit."
+}

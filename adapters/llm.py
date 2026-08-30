@@ -18,8 +18,15 @@ class LLMClient(Protocol):
 
 
 def _call_key(system: str, user: str, tag: str) -> str:
-    h = hashlib.sha256(f"{MODEL}\n{system}\n{user}".encode()).hexdigest()[:16]
-    return f"{tag}_{h}"
+    """Chave da gravacao: apenas a tag (estagio + notebook).
+
+    Cada estagio faz exatamente UMA chamada por notebook por run, entao a tag e
+    unica e estavel. Chavear pelo hash do prompt quebraria o replay sempre que
+    (a) um prompt evoluisse ou (b) um notebook sem seed produzisse metricas
+    novas na re-execucao (caso nb07) — exatamente o que a reproducao do juiz
+    nao pode exigir. O prompt integral continua gravado no arquivo, auditavel.
+    """
+    return tag.replace("/", "_")
 
 
 class OpenAIClient:
@@ -64,8 +71,8 @@ class ReplayClient:
         path = self.record_dir / f"{_call_key(system, user, tag)}.json"
         if not path.exists():
             raise FileNotFoundError(
-                f"Sem gravacao para {tag} ({path.name}). Os inputs mudaram desde a "
-                "run oficial — rode com --live (requer OPENAI_API_KEY) ou restaure os inputs.")
+                f"No recording for {tag} ({path.name}) in this run. "
+                "Run live (requires OPENAI_API_KEY) or pick an official run id.")
         return json.loads(path.read_text())["response"]
 
 

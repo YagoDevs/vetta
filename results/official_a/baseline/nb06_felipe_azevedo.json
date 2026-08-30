@@ -1,0 +1,28 @@
+{
+  "notebook": "nb06_felipe_azevedo.ipynb",
+  "findings": [
+    {
+      "type": "S2",
+      "cell": 6,
+      "claim": "Modeling uses a composite risk feature as an input.",
+      "evidence": "Cell 6 creates `risk_score = df['churned'] * df['n_complaints'] + df['late_payment']`, which directly uses the target `churned` to build a feature. This makes the feature unavailable at scoring time and leaks the label into X.",
+      "severity": "critical"
+    },
+    {
+      "type": "E1",
+      "cell": 11,
+      "claim": "\"With the new risk feature the model reaches AUC 0.99\".",
+      "evidence": "Cell 9 prints `AUC_TEST=0.858`, not ~0.99. The gap is 0.132 (> 0.05).",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "Critical leakage: a feature is engineered from the target itself (`risk_score` uses `churned`), invalidating the evaluation and any downstream interpretation. Additionally, the written conclusion claims AUC 0.99 while the executed test AUC is 0.858 (material mismatch). Decision: REJECT by rule (C1=1 and C3=1)."
+}

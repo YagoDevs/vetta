@@ -1,0 +1,134 @@
+{
+  "notebook": "nb03_carla_mendes.ipynb",
+  "findings": [
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "“The model reaches **AUC 0.93** on the test set …”",
+      "evidence": "The executed test AUC printed in cell 8 is AUC_TEST=0.729 (both run_a and run_b). The absolute gap vs the claimed 0.93 is 0.201 (> 0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "“Production-ready.” (implied by “excellent result” / “beats industry benchmarks”)",
+      "evidence": "On an imbalanced dataset (churn rate 0.157 printed in cell 5), the model’s test recall at the default 0.5 threshold is very low (RECALL_TEST=0.119 in cell 8). Declaring it production-ready based on AUC/benchmarks ignores that it misses most churners, which is typically unacceptable for a churn-retention use case unless thresholding/costs are addressed.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 1,
+    "C4": 2
+  },
+  "weighted_score": 3.2,
+  "decision": "REPROVAR",
+  "summary": "Overall, the notebook is technically competent in setup: it runs end-to-end, uses a proper stratified split, and evaluates with ROC AUC, which is sensible for an imbalanced churn problem. The key issue is a serious mismatch between the written conclusion and the actual results: it claims a test AUC of 0.93, but the executed output shows about 0.729, which undermines trust in the reporting. A second practical concern is that test recall at the default threshold is very low (~0.12) despite calling the model “production-ready,” meaning it would miss most churners in a typical retention use case. In the interview, verify how she produced the final numbers, whether she understands why AUC and recall can disagree, and how she would choose a decision threshold / cost-sensitive metric to meet business goals.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        }
+      },
+      "safety_flags": []
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.729,
+          "RECALL_TEST": 0.119,
+          "ACC_TEST": 0.853
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "0 nulos restantes\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.729\nRECALL_TEST=0.119\nACC_TEST=0.853\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.41\nc__contract_type_monthly    0.41\nn__tenure_months           -0.39\nn__n_support_calls          0.33\nn__n_complaints             0.32\nn__total_charges           -0.27\nn__monthly_charges          0.25\nn__late_payment             0.24\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "E1",
+          "cell": 10,
+          "claim": "“The model reaches **AUC 0.93** on the test set …”",
+          "evidence": "The executed test AUC printed in cell 8 is AUC_TEST=0.729 (both run_a and run_b). The absolute gap vs the claimed 0.93 is 0.201 (> 0.05).",
+          "severity": "critical"
+        },
+        {
+          "type": "S3",
+          "cell": 10,
+          "claim": "“Production-ready.” (implied by “excellent result” / “beats industry benchmarks”)",
+          "evidence": "On an imbalanced dataset (churn rate 0.157 printed in cell 5), the model’s test recall at the default 0.5 threshold is very low (RECALL_TEST=0.119 in cell 8). Declaring it production-ready based on AUC/benchmarks ignores that it misses most churners, which is typically unacceptable for a churn-retention use case unless thresholding/costs are addressed.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 5,
+        "C3": 1,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "They perform a stratified train/test split before fitting any preprocessing/model (cell 7) and use an appropriate ranking metric for imbalance (ROC AUC in cell 8); data messiness called out and handled explicitly in cleaning (cell 3). No verified leakage findings (S1/S2) are present.",
+        "C2": "The notebook executes end-to-end without exceptions (all code cells show outputs and no errors), with fixed random_state for split and model (cell 7) supporting stable results.",
+        "C3": "The conclusion claims test AUC = 0.93 (cell 10), but the executed output is AUC_TEST=0.729 (cell 8), a >0.05 divergence confirmed as an E1 critical finding; per rubric this forces C3=1.",
+        "C4": "The narrative asserts “Production-ready” and “excellent result” (cell 10), but the executed recall at the default threshold is very low (RECALL_TEST=0.119 in cell 8) on a 0.157 churn base rate (cell 5), matching the verified S3 major finding; conclusions are overstated and not aligned to the operational objective, so C4 is capped at 2."
+      }
+    }
+  ]
+}

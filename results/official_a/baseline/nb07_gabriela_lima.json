@@ -1,0 +1,21 @@
+{
+  "notebook": "nb07_gabriela_lima.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 3,
+      "claim": "Cleaning is handled explicitly (implying controlled handling of messy dates/values).",
+      "evidence": "Cell 3 coerces non-ISO dates to NaT using format='%Y-%m-%d' and then drops rows with NaT in reference_date and NaN in total_charges: df = df.dropna(subset=['reference_date','total_charges']). The notebook never prints how many rows were dropped or what share of the dataset this represents (only 'ok'). This is silent row loss that could be material given the stated presence of multiple date formats.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 3,
+    "C2": 4,
+    "C3": 5,
+    "C4": 4
+  },
+  "weighted_score": 4.0,
+  "decision": "REVISAR",
+  "summary": "Defects: S4 (silent data loss). Methodology is mostly correct: the split happens before preprocessing, and AUC is reported (appropriate for imbalance), but the cleaning step may discard a non-trivial portion of rows due to strict date parsing and missing totals without quantifying the impact. Code runs end-to-end as delivered and results are consistent within the notebook. Written metrics match outputs (AUC 0.721). Conclusions are supported by coefficients/EDA, though threshold-based recall is very low and could be discussed.\nWeighted score = 0.30*3 + 0.20*4 + 0.30*5 + 0.20*4 = 4.00. Decision per rules: ADVANCE (no criterion <=2, weighted >=3.5)."
+}

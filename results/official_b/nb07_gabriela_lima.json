@@ -1,0 +1,147 @@
+{
+  "notebook": "nb07_gabriela_lima.ipynb",
+  "findings": [
+    {
+      "type": "S4",
+      "cell": 3,
+      "claim": "Markdown claims: “The CSV has comma decimals, dates in two formats and inconsistent categories. Everything is handled explicitly.”",
+      "evidence": "Cleaning coerces `reference_date` using a single strict format (`format='%Y-%m-%d'`, `errors='coerce'`) and then drops rows with NaT via `df = df.dropna(subset=['reference_date', 'total_charges'])`. If the source truly has “dates in two formats”, the non-ISO format will be coerced to NaT and silently discarded. The notebook prints only 'ok' and does not report how many rows were dropped or what share of the dataset was lost.",
+      "severity": "major"
+    },
+    {
+      "type": "E3",
+      "cell": 7,
+      "claim": "Model evaluation is presented as a fixed test AUC in the conclusion, but the run is not reproducible.",
+      "evidence": "`train_test_split(..., stratify=y)` is called without `random_state`, so results vary between runs. Execution facts show AUC_TEST changes from 0.714 (run_a) to 0.705 (run_b), a difference of 0.009, and RECALL_TEST changes from 0.071 to 0.110 (difference 0.039). This indicates the reported metrics depend on an unfixed seed.",
+      "severity": "major"
+    },
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "Conclusion states: “Model with AUC 0.721 on the test set.”",
+      "evidence": "No cell computes or prints an AUC of 0.721. The evaluation cell prints AUC_TEST=0.714 in the provided execution output, and the alternate run shows AUC_TEST=0.705.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 2,
+    "C2": 2,
+    "C3": 1,
+    "C4": 2
+  },
+  "weighted_score": 1.7,
+  "decision": "REPROVAR",
+  "summary": "Overall quality is below the expected standard: while the basic train/test split and preprocessing pipeline are set up correctly, the analysis has major issues in reliability and reporting. The most important finding is an integrity mismatch: the written conclusion claims a test AUC of 0.721, but the notebook’s actual outputs show ~0.714 (and can drop to ~0.705 on another run), so the headline result is not supported by the code. The results are also not reproducible because the train/test split has no fixed random seed, and the data-cleaning description overstates what is handled (dates are parsed with only one format and rows that fail parsing are silently dropped without quantifying impact). In interview, ask the candidate to (1) reproduce the reported metrics with a fixed random_state, (2) explain and quantify how many rows were dropped during cleaning and why, and (3) address the very low recall at the default 0.5 threshold and what they would do to choose an operating threshold.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.071,
+          "ACC_TEST": 0.852
+        },
+        "b": {
+          "AUC_TEST": 0.705,
+          "RECALL_TEST": 0.11,
+          "ACC_TEST": 0.856
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.071,
+          "ACC_TEST": 0.852
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.705,
+          "RECALL_TEST": 0.11,
+          "ACC_TEST": 0.856
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "ok\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.153\ncontract_type\nannual     0.098\nmonthly    0.191\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.714\nRECALL_TEST=0.071\nACC_TEST=0.852\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "n__tenure_months           -0.44\nc__contract_type_monthly    0.44\nc__contract_type_annual    -0.44\nn__n_support_calls          0.34\nn__n_complaints             0.33\nn__total_charges           -0.22\nc__internet_tech_dsl       -0.17\nc__internet_tech_cable      0.17\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": [
+        {
+          "type": "S4",
+          "cell": 3,
+          "claim": "Markdown claims: “The CSV has comma decimals, dates in two formats and inconsistent categories. Everything is handled explicitly.”",
+          "evidence": "Cleaning coerces `reference_date` using a single strict format (`format='%Y-%m-%d'`, `errors='coerce'`) and then drops rows with NaT via `df = df.dropna(subset=['reference_date', 'total_charges'])`. If the source truly has “dates in two formats”, the non-ISO format will be coerced to NaT and silently discarded. The notebook prints only 'ok' and does not report how many rows were dropped or what share of the dataset was lost.",
+          "severity": "major"
+        },
+        {
+          "type": "E3",
+          "cell": 7,
+          "claim": "Model evaluation is presented as a fixed test AUC in the conclusion, but the run is not reproducible.",
+          "evidence": "`train_test_split(..., stratify=y)` is called without `random_state`, so results vary between runs. Execution facts show AUC_TEST changes from 0.714 (run_a) to 0.705 (run_b), a difference of 0.009, and RECALL_TEST changes from 0.071 to 0.110 (difference 0.039). This indicates the reported metrics depend on an unfixed seed.",
+          "severity": "major"
+        },
+        {
+          "type": "E4",
+          "cell": 10,
+          "claim": "Conclusion states: “Model with AUC 0.721 on the test set.”",
+          "evidence": "No cell computes or prints an AUC of 0.721. The evaluation cell prints AUC_TEST=0.714 in the provided execution output, and the alternate run shows AUC_TEST=0.705.",
+          "severity": "major"
+        }
+      ]
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 2,
+        "C2": 2,
+        "C3": 1,
+        "C4": 2
+      },
+      "justifications": {
+        "C1": "The split/preprocessing pipeline is set up correctly (cell 7: train_test_split before fitting; ColumnTransformer+Pipeline avoids fitting scalers/encoders on test). However, the cleaning narrative overclaims “dates in two formats… handled explicitly” while code parses only '%Y-%m-%d' and then drops non-parsing rows without quantifying impact (cell 3; verified S4), which is a notable methodology weakness on messy data handling.",
+        "C2": "The notebook executes end-to-end in the provided run, but results are not stable because train_test_split is called without random_state (cell 7), and verified execution shows material variation across runs (E3: AUC 0.714 vs 0.705; recall 0.071 vs 0.110). This is cell-order/seed dependence rather than a hard exception, so it lands below “clean, stable results.”",
+        "C3": "The written result does not match what the code produces: the conclusion claims “AUC 0.721” (cell 10) while the executed evaluation prints AUC_TEST=0.714 (and another run 0.705), and no cell outputs 0.721 (verified E4). Per rubric, this is a critical integrity failure.",
+        "C4": "Conclusions are weakly supported and partly contradict the produced numbers: the stated AUC is wrong (cell 10 vs cell 8; verified E4), and the narrative doesn’t acknowledge extremely low recall at the 0.5 threshold (cell 8: RECALL_TEST=0.071). The qualitative drivers mentioned (monthly contracts/complaints) are at least consistent with the coefficient table (cell 9), but the communication is undermined by the incorrect headline metric."
+      }
+    }
+  ]
+}

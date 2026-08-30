@@ -1,0 +1,28 @@
+{
+  "notebook": "nb04_diego_rocha.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "Markdown (cell 6) claims: \"Stratified split BEFORE any transformation; preprocessing learns from the training set only.\"",
+      "evidence": "In cell 7, numeric features are scaled on the full dataset before the train/test split: `df[num] = StandardScaler().fit_transform(df[num])` occurs before `train_test_split(...)`. This fits the scaler using test data distribution (leakage).",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "Conclusion claims: \"The model achieves 0.853 accuracy, an excellent performance... production-ready.\"",
+      "evidence": "Churn rate shown in cell 5 is 0.157 (imbalanced). Test recall in cell 8 is 0.119, meaning the model misses most churners at the chosen threshold; relying on accuracy is misleading here despite AUC=0.729.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 5,
+    "C4": 1
+  },
+  "weighted_score": 3.0,
+  "decision": "REPROVAR",
+  "summary": "Defects: (S1) numeric scaling is fit on the full dataset before the split, contradicting the stated methodology and causing leakage; (S3) the narrative leans on accuracy as “excellent” on an imbalanced target while recall is very low (0.119), making the production-ready claim unsupported. Scores: C1=1 (critical methodology issue and misleading metric), C2=5 (runs end-to-end with fixed seed), C3=5 (stated accuracy matches the computed value), C4=1 (conclusions are not supported by the evaluation metrics). Decision by rubric: REJECT (any criterion = 1)."
+}

@@ -1,0 +1,35 @@
+{
+  "notebook": "nb03_carla_mendes.ipynb",
+  "findings": [
+    {
+      "type": "E1",
+      "cell": 10,
+      "claim": "“The model reaches AUC 0.93 on the test set”",
+      "evidence": "Cell 8 prints AUC_TEST=0.729, not 0.93 (difference 0.201 > 0.05).",
+      "severity": "critical"
+    },
+    {
+      "type": "E4",
+      "cell": 10,
+      "claim": "“beats industry benchmarks. Production-ready.” (implies a benchmark comparison)",
+      "evidence": "No cell computes or references any industry benchmark or comparison value; only AUC/recall/accuracy are computed in cell 8.",
+      "severity": "major"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "“Production-ready.” based on the reported test performance",
+      "evidence": "Cell 8 shows RECALL_TEST=0.119 at the default 0.5 threshold while churn rate is 0.157 (cell 5). Relying on high accuracy (0.853) would be misleading for churn capture; no threshold tuning or PR/recall-focused evaluation is provided.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 1,
+    "C4": 1
+  },
+  "weighted_score": 1.8,
+  "decision": "REPROVAR",
+  "summary": "Defects: (1) The written AUC (0.93) contradicts the executed test AUC (0.729), a critical integrity failure (E1). (2) The conclusion references benchmarks without any computed benchmark (E4). (3) The conclusion implies readiness despite very low recall (0.119) and potential reliance on accuracy, which is not appropriate for churn capture without discussion/thresholding (S3). Methodology for splitting and preprocessing is otherwise correct and leakage-free. Weighted score = 0.30*1 + 0.20*5 + 0.30*1 + 0.20*1 = 1.7. Decision per rules: REJECT."
+}

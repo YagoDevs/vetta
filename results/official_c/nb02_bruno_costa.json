@@ -1,0 +1,103 @@
+{
+  "notebook": "nb02_bruno_costa.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 5
+  },
+  "weighted_score": 5.0,
+  "decision": "AVANCAR",
+  "summary": "Overall quality is strong: the notebook runs cleanly end-to-end, uses a proper train/test split and a Pipeline so preprocessing is learned only from training data, and reports a suitable metric (ROC AUC) for an imbalanced churn problem. The most important finding is that the reported performance (AUC 0.714) is internally consistent and the feature-importance narrative matches the model outputs, suggesting the results are trustworthy rather than “hand-waved.” In the interview, verify they can explain why ROC AUC was chosen, how the Pipeline/ColumnTransformer prevents data leakage, and what they would do next to make the model operational (threshold selection, calibration, and validating on a time-based split). Role requirements were not provided, so fit-to-role cannot be assessed from this review.",
+  "trajectory": [
+    {
+      "agent": "executor",
+      "executed_ok": true,
+      "error_cells": [],
+      "metrics": {
+        "a": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        },
+        "b": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        }
+      }
+    },
+    {
+      "agent": "verifier",
+      "input_facts": {
+        "executed_ok": true,
+        "error_cells": [],
+        "printed_metrics_run_a": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        },
+        "printed_metrics_run_b": {
+          "AUC_TEST": 0.714,
+          "RECALL_TEST": 0.089,
+          "ACC_TEST": 0.845
+        },
+        "cell_outputs": [
+          {
+            "cell": 1,
+            "outputs": [
+              "(6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 3,
+            "outputs": [
+              "shape after cleaning: (6000, 15)\n"
+            ]
+          },
+          {
+            "cell": 5,
+            "outputs": [
+              "churn rate: 0.157\ncontract_type\nannual     0.100\nmonthly    0.196\nName: churned, dtype: float64\n"
+            ]
+          },
+          {
+            "cell": 7,
+            "outputs": [
+              "Pipeline(steps=[('pre',\n                 ColumnTransformer(transformers=[('n', StandardScaler(),\n                                                  ['tenure_months',\n                                                   'monthly_charges',\n                                                   'total_charges',\n                                                   'avg_data_gb',\n                                                   'n_support_calls',\n                                                   'n_complai"
+            ]
+          },
+          {
+            "cell": 8,
+            "outputs": [
+              "AUC_TEST=0.714\nRECALL_TEST=0.089\nACC_TEST=0.845\n"
+            ]
+          },
+          {
+            "cell": 9,
+            "outputs": [
+              "c__contract_type_annual    -0.45\nc__contract_type_monthly    0.44\nn__tenure_months           -0.39\nn__n_support_calls          0.37\nn__n_complaints             0.32\nn__total_charges           -0.30\nn__late_payment             0.25\nn__monthly_charges          0.23\ndtype: float64\n"
+            ]
+          }
+        ]
+      },
+      "findings": []
+    },
+    {
+      "agent": "assessor",
+      "scores": {
+        "C1": 5,
+        "C2": 5,
+        "C3": 5,
+        "C4": 5
+      },
+      "justifications": {
+        "C1": "They split into train/test before fitting any preprocessing or model (cell 7), and the preprocessing is inside a Pipeline/ColumnTransformer so scaling/OHE are learned only from training data; they also use an appropriate ranking metric (ROC AUC) for an imbalanced churn rate (~15.7%, cell 5) and explicitly handle messy decimals/categories (cell 3).",
+        "C2": "The notebook executes end-to-end with no exceptions and produces stable results due to fixed random_state in the split and model (cell 7); outputs are coherent and there is no cell-order dependence evident.",
+        "C3": "The conclusion’s stated AUC (0.714) matches the executed metric output exactly (cell 8 and conclusion in cell 10), and the narrative about key drivers aligns with the printed largest-magnitude coefficients (cell 9).",
+        "C4": "Conclusions are directly supported by the reported AUC and coefficient inspection (cells 8–10), include a concrete business action (target monthly-contract customers with complaints) and acknowledge a key limitation with a sensible next step (threshold calibration and temporal validation, cell 10)."
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "notebook": "nb01_ana_ferreira.ipynb",
+  "findings": [],
+  "scores": {
+    "C1": 5,
+    "C2": 5,
+    "C3": 5,
+    "C4": 5
+  },
+  "weighted_score": 5.0,
+  "decision": "AVANCAR",
+  "summary": "No defects detected with concrete evidence. The notebook performs a stratified train/test split before fitting any preprocessing or model (Pipeline + ColumnTransformer prevents leakage), uses an appropriate ranking metric for imbalance (ROC AUC) while also reporting recall/accuracy and discussing threshold calibration, and handles messy inputs (comma decimals, mixed date parsing, category normalization, missing-value imputation) with zero missing values remaining. Code appears runnable end-to-end with fixed seeds (random_state=42) and stable outputs. The written conclusions match computed results (AUC 0.729) and are consistent with the coefficient table and reported low recall at 0.5 threshold."
+}

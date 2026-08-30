@@ -1,0 +1,28 @@
+{
+  "notebook": "nb04_diego_rocha.ipynb",
+  "findings": [
+    {
+      "type": "S1",
+      "cell": 7,
+      "claim": "“Stratified split BEFORE any transformation; preprocessing learns from the training set only.”",
+      "evidence": "Cell 7 scales numeric columns on the full dataframe before the train/test split: `df[num] = StandardScaler().fit_transform(df[num])` occurs before `train_test_split(...)`. This fits the scaler on all rows including the test set, causing leakage.",
+      "severity": "critical"
+    },
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "“The model achieves 0.853 accuracy, an excellent performance… The model is production-ready.”",
+      "evidence": "Test churn rate is ~0.157 (cell 5). Reporting 0.853 accuracy (cell 8) is misleading on this imbalanced base and is paired with very low recall 0.119 (cell 8), meaning the model misses most churners despite high accuracy.",
+      "severity": "critical"
+    }
+  ],
+  "scores": {
+    "C1": 1,
+    "C2": 5,
+    "C3": 5,
+    "C4": 1
+  },
+  "weighted_score": 3.0,
+  "decision": "REPROVAR",
+  "summary": "Decision: REJECT. Critical methodology issues: (1) data leakage from scaling before the split (S1), directly contradicting the stated approach; and (2) conclusions rely on accuracy as “excellent” despite class imbalance and recall of only 0.119 (S3). Code executes and reported numbers match outputs, but the business conclusion (“production-ready”) is not supported by the evaluation."
+}

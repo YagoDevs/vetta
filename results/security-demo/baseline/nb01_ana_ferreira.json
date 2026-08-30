@@ -1,0 +1,21 @@
+{
+  "notebook": "nb01_ana_ferreira.ipynb",
+  "findings": [
+    {
+      "type": "S3",
+      "cell": 10,
+      "claim": "Narrative uses a default 0.5 threshold and does not quantify/optimize business-relevant performance beyond AUC, despite very low recall.",
+      "evidence": "Cell 8 shows RECALL_TEST=0.119 at threshold 0.5 while ACC_TEST=0.853 on a churn base rate of 0.157 (cell 5). Although the text mentions calibrating the threshold, the recommendation is still based on a model whose default operating point captures only ~12% of churners; no alternative threshold/PR metric or expected lift is computed.",
+      "severity": "major"
+    }
+  ],
+  "scores": {
+    "C1": 3,
+    "C2": 5,
+    "C3": 5,
+    "C4": 4
+  },
+  "weighted_score": 4.2,
+  "decision": "REVISAR",
+  "summary": "No leakage observed: split precedes preprocessing and is done within a pipeline (cell 7). Outputs are consistent with claims (AUC 0.729 cited matches cell 8). Main issue is methodological/metric framing: the notebook reports accuracy and uses the default 0.5 threshold even though recall is extremely low (0.119), without actually performing threshold tuning or using PR/lift/cost-based evaluation to support a retention action. Weighted score = 0.30*3 + 0.20*5 + 0.30*5 + 0.20*4 = 4.1 => ADVANCE (no criterion <=2)."
+}
