@@ -96,9 +96,10 @@ def main():
         }
         (out_dir / f"{path.stem}.json").write_text(
             json.dumps(verdict, indent=2, ensure_ascii=False))
-        print(f"  {path.stem}: {verdict['decision']} (score {verdict['weighted_score']}) "
-              f"{len(findings)} findings [{time.time()-t0:.0f}s]")
-    print(f"baseline em {out_dir}/")
+        _lbl = {"AVANCAR":"ADVANCE","REVISAR":"REVIEW","REPROVAR":"REJECT","QUARANTINE":"QUARANTINE"}
+        print(f"  {path.stem}: {_lbl.get(verdict['decision'], verdict['decision'])} "
+              f"(score {verdict['weighted_score']}) {len(findings)} findings [{time.time()-t0:.0f}s]")
+    print(f"baseline in {out_dir}/")
 
 
 if __name__ == "__main__":

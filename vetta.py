@@ -61,9 +61,10 @@ def run(nb_dir: Path, mode: str, run_id: str, requirements: str = ''):
         verdict = report(llm, facts, findings, scores, justs, trajectory, requirements)
         out = out_dir / f"{path.stem}.json"
         out.write_text(json.dumps(verdict.to_dict(), indent=2, ensure_ascii=False))
-        print(f"  {path.stem}: {verdict.decision} (score {verdict.weighted_score}) "
-              f"{len(findings)} findings [{time.time()-t0:.0f}s]")
-    print(f"resultados em {out_dir}/")
+        _lbl = {"AVANCAR": "ADVANCE", "REVISAR": "REVIEW", "REPROVAR": "REJECT"}
+        print(f"  {path.stem}: {_lbl.get(verdict.decision, verdict.decision)} "
+              f"(score {verdict.weighted_score}) {len(findings)} findings [{time.time()-t0:.0f}s]")
+    print(f"results in {out_dir}/")
 
 
 def main():

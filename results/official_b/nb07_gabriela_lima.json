@@ -39,16 +39,17 @@
       "error_cells": [],
       "metrics": {
         "a": {
-          "AUC_TEST": 0.714,
-          "RECALL_TEST": 0.071,
+          "AUC_TEST": 0.716,
+          "RECALL_TEST": 0.09,
           "ACC_TEST": 0.852
         },
         "b": {
-          "AUC_TEST": 0.705,
-          "RECALL_TEST": 0.11,
-          "ACC_TEST": 0.856
+          "AUC_TEST": 0.753,
+          "RECALL_TEST": 0.039,
+          "ACC_TEST": 0.846
         }
-      }
+      },
+      "safety_flags": []
     },
     {
       "agent": "verifier",
@@ -56,14 +57,14 @@
         "executed_ok": true,
         "error_cells": [],
         "printed_metrics_run_a": {
-          "AUC_TEST": 0.714,
-          "RECALL_TEST": 0.071,
+          "AUC_TEST": 0.716,
+          "RECALL_TEST": 0.09,
           "ACC_TEST": 0.852
         },
         "printed_metrics_run_b": {
-          "AUC_TEST": 0.705,
-          "RECALL_TEST": 0.11,
-          "ACC_TEST": 0.856
+          "AUC_TEST": 0.753,
+          "RECALL_TEST": 0.039,
+          "ACC_TEST": 0.846
         },
         "cell_outputs": [
           {
@@ -93,13 +94,13 @@
           {
             "cell": 8,
             "outputs": [
-              "AUC_TEST=0.714\nRECALL_TEST=0.071\nACC_TEST=0.852\n"
+              "AUC_TEST=0.716\nRECALL_TEST=0.090\nACC_TEST=0.852\n"
             ]
           },
           {
             "cell": 9,
             "outputs": [
-              "n__tenure_months           -0.44\nc__contract_type_monthly    0.44\nc__contract_type_annual    -0.44\nn__n_support_calls          0.34\nn__n_complaints             0.33\nn__total_charges           -0.22\nc__internet_tech_dsl       -0.17\nc__internet_tech_cable      0.17\ndtype: float64\n"
+              "c__contract_type_monthly    0.48\nc__contract_type_annual    -0.48\nn__tenure_months           -0.40\nn__n_complaints             0.35\nn__n_support_calls          0.34\nn__total_charges           -0.27\nn__monthly_charges          0.18\nn__late_payment             0.18\ndtype: float64\n"
             ]
           }
         ]

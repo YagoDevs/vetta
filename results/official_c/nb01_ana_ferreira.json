@@ -26,7 +26,8 @@
           "RECALL_TEST": 0.119,
           "ACC_TEST": 0.853
         }
-      }
+      },
+      "safety_flags": []
     },
     {
       "agent": "verifier",

@@ -25,14 +25,14 @@
       "error_cells": [],
       "metrics": {
         "a": {
-          "AUC_TEST": 0.709,
-          "RECALL_TEST": 0.065,
-          "ACC_TEST": 0.849
+          "AUC_TEST": 0.687,
+          "RECALL_TEST": 0.058,
+          "ACC_TEST": 0.843
         },
         "b": {
-          "AUC_TEST": 0.7,
-          "RECALL_TEST": 0.065,
-          "ACC_TEST": 0.85
+          "AUC_TEST": 0.719,
+          "RECALL_TEST": 0.097,
+          "ACC_TEST": 0.856
         }
       },
       "safety_flags": []
@@ -43,14 +43,14 @@
         "executed_ok": true,
         "error_cells": [],
         "printed_metrics_run_a": {
-          "AUC_TEST": 0.709,
-          "RECALL_TEST": 0.065,
-          "ACC_TEST": 0.849
+          "AUC_TEST": 0.687,
+          "RECALL_TEST": 0.058,
+          "ACC_TEST": 0.843
         },
         "printed_metrics_run_b": {
-          "AUC_TEST": 0.7,
-          "RECALL_TEST": 0.065,
-          "ACC_TEST": 0.85
+          "AUC_TEST": 0.719,
+          "RECALL_TEST": 0.097,
+          "ACC_TEST": 0.856
         },
         "cell_outputs": [
           {
@@ -80,13 +80,13 @@
           {
             "cell": 8,
             "outputs": [
-              "AUC_TEST=0.709\nRECALL_TEST=0.065\nACC_TEST=0.849\n"
+              "AUC_TEST=0.687\nRECALL_TEST=0.058\nACC_TEST=0.843\n"
             ]
           },
           {
             "cell": 9,
             "outputs": [
-              "c__contract_type_annual    -0.41\nc__contract_type_monthly    0.41\nn__total_charges           -0.38\nn__n_support_calls          0.36\nn__n_complaints             0.34\nn__tenure_months           -0.33\nn__monthly_charges          0.24\nn__late_payment             0.17\ndtype: float64\n"
+              "n__tenure_months           -0.48\nc__contract_type_monthly    0.42\nc__contract_type_annual    -0.41\nn__n_support_calls          0.37\nn__n_complaints             0.29\nn__has_autopay             -0.24\nn__late_payment             0.23\nn__total_charges           -0.21\ndtype: float64\n"
             ]
           }
         ]

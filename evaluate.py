@@ -89,7 +89,7 @@ def main():
             out[label] = score_run(d)
     (agent_dir / "evaluation.json").write_text(json.dumps(out, indent=2, ensure_ascii=False))
 
-    print(f"{'':22} {'baseline':>10} {'agente':>10}")
+    print(f"{'':26} {'baseline':>10} {'vetta':>10}")
     def row(label, path):
         b = out.get("baseline", {})
         a = out.get("agent", {})
@@ -99,17 +99,17 @@ def main():
         for k in path:
             bv = bv.get(k, {}) if isinstance(bv, dict) else {}
             av = av.get(k, {}) if isinstance(av, dict) else {}
-        print(f"{label:22} {str(bv) if not isinstance(bv, dict) else '-':>10} {str(av) if not isinstance(av, dict) else '-':>10}")
+        print(f"{label:26} {str(bv) if not isinstance(bv, dict) else '-':>10} {str(av) if not isinstance(av, dict) else '-':>10}")
     for label, path in [
-        ("precision (defeitos)", ["defects", "precision"]),
-        ("recall (defeitos)", ["defects", "recall"]),
-        ("f1 (defeitos)", ["defects", "f1"]),
-        ("recall classe S", ["by_class", "S_static", "recall"]),
-        ("recall classe E", ["by_class", "E_executable", "recall"]),
-        ("acuracia decisao", ["decision_accuracy"]),
+        ("precision (defects)", ["defects", "precision"]),
+        ("recall (defects)", ["defects", "recall"]),
+        ("f1 (defects)", ["defects", "f1"]),
+        ("recall class S (static)", ["by_class", "S_static", "recall"]),
+        ("recall class E (exec-only)", ["by_class", "E_executable", "recall"]),
+        ("decision accuracy", ["decision_accuracy"]),
     ]:
         row(label, path)
-    print(f"\ndetalhe em {agent_dir / 'evaluation.json'}")
+    print(f"\ndetail in {agent_dir / 'evaluation.json'}")
 
 
 if __name__ == "__main__":
