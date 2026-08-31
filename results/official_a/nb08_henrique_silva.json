@@ -143,6 +143,12 @@
         "C3": "The conclusion claims “0.97 AUC” but the executed test AUC is 0.729 in cell 8 (gap 0.241 > 0.05), a critical mismatch (E1 critical).",
         "C4": "The conclusion is not supported by the computed results: it asserts 0.97 AUC and “0.91 precision on fiber customers” even though only AUC/recall/accuracy are shown (cell 8) and no precision or fiber subgroup analysis is produced (E4), so the recommendation to deploy is unjustified."
       }
+    },
+    {
+      "agent": "reporter",
+      "decision": "REPROVAR",
+      "weighted_score": 2.0,
+      "summary": "Overall quality is below the bar despite the notebook running end-to-end and producing outputs. The most important issue is a serious evaluation flaw: the data scaling is fitted on the full dataset before the train/test split, which leaks test information into training and makes the reported performance unreliable. There are also critical reporting inaccuracies: the written conclusion claims 0.97 AUC (and 0.91 precision on “fiber customers”), but the executed test AUC is 0.729 and no precision or fiber-segment analysis is shown. In the interview, ask the candidate to explain why preprocessing must be fit on the training set only (and how to implement it correctly, e.g., with a pipeline), and to walk through how they would verify and report metrics so conclusions match computed results."
     }
   ]
 }

@@ -149,6 +149,12 @@
         "C3": "The written conclusion claims AUC 0.99 (cell 11), but the executed output shows AUC_TEST=0.858 (cell 9), a >0.05 divergence (E1 critical => C3=1).",
         "C4": "Narrative claims proper methodology (“split BEFORE any transformation… training set only”, cell 7), but the engineered feature is created pre-split and encodes y (cell 6), so the conclusions about feature engineering impact are not supported (E4 => C4<=2)."
       }
+    },
+    {
+      "agent": "reporter",
+      "decision": "REPROVAR",
+      "weighted_score": 2.0,
+      "summary": "Overall quality is below the bar: while the notebook runs end-to-end and uses standard scikit-learn pipelines correctly, the reported model performance cannot be trusted. The most important issue is a critical data leakage bug where a new feature (risk_score) is built using the target label (churned) before the train/test split, which effectively lets the model “see the answer” and invalidates the evaluation. There is also a major inconsistency between the written conclusion (AUC 0.99) and the actual printed test result (AUC 0.858), suggesting weak result tracking and verification. In the interview, ask the candidate to explain what data leakage is, identify why using the target in feature engineering breaks validation, and describe how they would structure feature engineering and reporting to keep train/test separation and metrics consistent."
     }
   ]
 }

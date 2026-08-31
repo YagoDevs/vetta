@@ -27,12 +27,20 @@ def report(llm, facts: ExecutionFacts, findings: list[Finding],
          "role_requirements": requirements or "not provided"},
         ensure_ascii=False)
     resp = llm.complete(SYSTEM, user, tag=f"report_{facts.notebook}")
+    summary = resp.get("summary", "")
+    # registra o passo do reporter na trajetoria (trace do 4o agente)
+    trajectory = trajectory + [{
+        "agent": "reporter",
+        "decision": decision,
+        "weighted_score": weighted_score(scores),
+        "summary": summary,
+    }]
     return Verdict(
         notebook=facts.notebook,
         findings=findings,
         scores=scores,
         weighted_score=weighted_score(scores),
         decision=decision,
-        summary=resp.get("summary", ""),
+        summary=summary,
         trajectory=trajectory,
     )

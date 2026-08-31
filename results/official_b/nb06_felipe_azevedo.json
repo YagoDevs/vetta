@@ -149,6 +149,12 @@
         "C3": "The written result is materially inconsistent with execution: the conclusion claims AUC 0.99 (cell 11), but the executed test AUC is 0.858 (cell 9), a >0.05 divergence (verified finding E1 critical).",
         "C4": "The communication contains a major methodological misstatement: it claims split/preprocessing prevents leakage (cell 7) while the earlier feature engineering uses the target on the full dataset (cell 6), and the conclusion overstates performance (cells 7 and 11; verified E4), so the recommendation is not reliably supported."
       }
+    },
+    {
+      "agent": "reporter",
+      "decision": "REPROVAR",
+      "weighted_score": 2.0,
+      "summary": "Overall quality is not acceptable despite the notebook running cleanly and producing reproducible metrics. The most important issue is critical “target leakage”: the candidate creates an input feature using the true churn label, which artificially boosts performance and makes the test results invalid. There is also a major mismatch between what is written and what is actually computed (they claim AUC 0.99, but the executed test AUC is 0.858), which raises reliability concerns. In the interview, ask them to explain what target leakage is, identify why their risk_score is problematic, and describe how they would redesign the feature engineering and evaluation so the target is never used when building model inputs."
     }
   ]
 }

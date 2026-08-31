@@ -32,14 +32,14 @@
       "error_cells": [],
       "metrics": {
         "a": {
-          "AUC_TEST": 0.721,
-          "RECALL_TEST": 0.071,
-          "ACC_TEST": 0.853
+          "AUC_TEST": 0.738,
+          "RECALL_TEST": 0.065,
+          "ACC_TEST": 0.849
         },
         "b": {
-          "AUC_TEST": 0.74,
-          "RECALL_TEST": 0.09,
-          "ACC_TEST": 0.852
+          "AUC_TEST": 0.693,
+          "RECALL_TEST": 0.116,
+          "ACC_TEST": 0.857
         }
       },
       "safety_flags": []
@@ -50,14 +50,14 @@
         "executed_ok": true,
         "error_cells": [],
         "printed_metrics_run_a": {
-          "AUC_TEST": 0.721,
-          "RECALL_TEST": 0.071,
-          "ACC_TEST": 0.853
+          "AUC_TEST": 0.738,
+          "RECALL_TEST": 0.065,
+          "ACC_TEST": 0.849
         },
         "printed_metrics_run_b": {
-          "AUC_TEST": 0.74,
-          "RECALL_TEST": 0.09,
-          "ACC_TEST": 0.852
+          "AUC_TEST": 0.693,
+          "RECALL_TEST": 0.116,
+          "ACC_TEST": 0.857
         },
         "cell_outputs": [
           {
@@ -87,13 +87,13 @@
           {
             "cell": 8,
             "outputs": [
-              "AUC_TEST=0.721\nRECALL_TEST=0.071\nACC_TEST=0.853\n"
+              "AUC_TEST=0.738\nRECALL_TEST=0.065\nACC_TEST=0.849\n"
             ]
           },
           {
             "cell": 9,
             "outputs": [
-              "c__contract_type_monthly    0.41\nn__tenure_months           -0.40\nc__contract_type_annual    -0.40\nn__n_support_calls          0.34\nn__n_complaints             0.28\nn__total_charges           -0.25\nn__monthly_charges          0.22\nn__late_payment             0.19\ndtype: float64\n"
+              "c__contract_type_annual    -0.39\nc__contract_type_monthly    0.39\nn__tenure_months           -0.38\nn__n_support_calls          0.34\nn__n_complaints             0.31\nn__total_charges           -0.30\nn__late_payment             0.20\nc__region_South            -0.19\ndtype: float64\n"
             ]
           }
         ]
@@ -129,6 +129,12 @@
         "C3": "The conclusion claims AUC 0.721 (cell 10) while the executed output in this run is AUC_TEST=0.711 (cell 8), a small divergence (0.010) that does not change the conclusion; however E3 confirms this number is also not reproducible due to the missing seed, so integrity is only partial rather than perfect.",
         "C4": "Conclusions are broadly supported by the model coefficients (monthly contract positive, annual negative; complaints/support calls positive in cell 9) and the churn-rate EDA (cell 5), but the write-up does not acknowledge the very low recall at the chosen 0.5 threshold (cell 8) or the row-dropping risk from cleaning (cell 3), so communication is good but not fully actionable."
       }
+    },
+    {
+      "agent": "reporter",
+      "decision": "REVISAR",
+      "weighted_score": 2.7,
+      "summary": "Overall, this notebook shows solid basic ML hygiene (stratified split and preprocessing kept inside a scikit-learn Pipeline), but there are two major issues that keep it in “review” status. The most important finding is that the data cleaning step converts non-matching date formats to missing values and then drops rows without reporting how many are removed, which could silently bias the dataset. Results are also not reproducible because the train/test split has no fixed random seed, and the reported test AUC changes noticeably between runs. In the interview, verify that she can (1) quantify and justify any row dropping/failed date parsing, (2) make evaluation reproducible (set seeds, use cross-validation), and (3) discuss threshold choice/recall trade-offs since the current 0.5 threshold yields very low recall."
     }
   ]
 }
